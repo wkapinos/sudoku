@@ -1,0 +1,109 @@
+body {
+    font-family: Arial, sans-serif;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    background-color: #f0f0f0;
+    margin: 0;
+}
+
+h1 {
+    color: #333;
+    margin-bottom: 20px;
+}
+
+.sudoku-board {
+    display: grid;
+    /* Tworzymy siatkę 9x9 */
+    grid-template-columns: repeat(9, 40px);
+    grid-template-rows: repeat(9, 40px);
+    gap: 1px; /* mała przerwa między komórkami */
+    background-color: #333; /* kolor linii między komórkami */
+    border: 2px solid #000; /* grubsza ramka wokół planszy */
+    box-shadow: 2px 2px 5px rgba(0,0,0,0.3);
+}
+
+.cell {
+    width: 40px;
+    height: 40px;
+    background-color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2em;
+    font-weight: bold;
+    color: #000;
+    border: 0.5px solid #bbb; /* cienkie linie wewnątrz kwadratów */
+    box-sizing: border-box; /* aby padding i border nie powiększały elementu */
+}
+
+/* Grubsze linie dla kwadratów 3x3 */
+.cell:nth-child(3n) {
+    border-right: 2px solid #000;
+}
+.cell:nth-child(n+1):nth-child(-n+9):nth-child(3n+1) { /* Pierwsze 3 komórki w wierszu, które są ostatnie w kwadracie */
+    border-right: 2px solid #000;
+}
+
+.cell:nth-child(27n + 1), .cell:nth-child(27n + 2), .cell:nth-child(27n + 3),
+.cell:nth-child(27n + 4), .cell:nth-child(27n + 5), .cell:nth-child(27n + 6),
+.cell:nth-child(27n + 7), .cell:nth-child(27n + 8), .cell:nth-child(27n + 9) {
+    border-bottom: 2px solid #000;
+}
+
+.cell:nth-child(9n+1):nth-child(n+1):nth-child(-n+81) { /* Każda 9 komórka to początek nowego wiersza */
+    border-left: none; /* Usuń lewą ramkę, która jest na początku wiersza */
+}
+
+/* Dostosowanie ramki dla wierszy 3, 6 */
+.cell:nth-child(27n+1):nth-child(-n+81) { /* Cells in the 3rd, 6th row of blocks */
+    border-bottom: 2px solid #000;
+}
+
+/* Dodatkowe linie dla bloków 3x3 */
+/* Co 3 wiersz */
+.sudoku-board div:nth-child(n) {
+    border-top: none;
+}
+.sudoku-board div:nth-child(27n+1):nth-child(-n+81) {
+    border-top: 2px solid #000;
+}
+/* Komórki początkowe w co trzecim bloku wierszy */
+.sudoku-board div:nth-child(1), .sudoku-board div:nth-child(28), .sudoku-board div:nth-child(55) {
+    border-top: 2px solid #000;
+}
+
+
+/* Komórki, które są podawane (nie są do zmiany przez gracza) */
+.given-number {
+    background-color: #e0e0e0;
+    color: #000;
+}
+
+/* Komórki, które gracz będzie wypełniał */
+.empty-cell {
+    cursor: pointer;
+    background-color: #fff;
+}
+
+.empty-cell.selected {
+    background-color: #cceeff;
+}
+
+button {
+    margin-top: 20px;
+    padding: 10px 20px;
+    font-size: 1.1em;
+    cursor: pointer;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    transition: background-color 0.3s ease;
+}
+
+button:hover {
+    background-color: #0056b3;
+}

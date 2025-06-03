@@ -9,14 +9,10 @@ document.addEventListener('DOMContentLoaded', () => {
     let currentBoard = [];
     let currentSize = 9;
     let currentDifficulty = 'medium';
+    let highlightedValue = null; // Przechowuje aktualnie podświetlaną wartość
 
     // Definicje poziomów trudności
     const DIFFICULTY_LEVELS = {
-        '6': {
-            'easy': 0.55,      // 55% zakryte
-            'medium': 0.65,    // 65% zakryte
-            'hard': 0.75       // 75% zakryte
-        },
         '9': {
             'easy': 0.55,      // 55% zakryte
             'medium': 0.65,    // 65% zakryte
@@ -81,45 +77,122 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // --- Funkcja do wyświetlania planszy Sudoku na stronie ---
-    function displaySudokuBoard(board, boardSize) {
-        sudokuBoard.innerHTML = ''; // Wyczyść planszę przed ponownym rysowaniem
-        sudokuBoard.className = `sudoku-board size-${boardSize}`;
-
-        for (let r = 0; r < boardSize; r++) {
-            for (let c = 0; c < boardSize; c++) {
-                const cell = document.createElement('div');
-                cell.classList.add('cell');
-                const value = board[r][c];
-
-                if (value !== 0) { // Jeśli komórka nie jest pusta (0), wyświetl liczbę
-                    cell.textContent = value;
-                    cell.classList.add('given-number'); // Dodaj klasę dla wstępnie podanych liczb
-                } else {
-                    // Jeśli komórka jest pusta, będzie do uzupełnienia
-                    cell.classList.add('empty-cell');
+    
+      // --- Funkcja do podświetlania komórek z tą samą wartością ---
+    function highlightSameValues(targetValue) {
+        const cells = sudokuBoard.querySelectorAll('.cell');
+        
+        // Usuń poprzednie podświetlenia
+        cells.forEach(cell => {
+            cell.classList.remove('highlighted');
+        });
+        
+        // Jeśli kliknięto na tę samą wartość, wyłącz podświetlanie
+        // if (highlightedValue === targetValue) {
+        //     highlightedValue = null;
+        //     return;
+        // }
+        
+        // Podświetl komórki z tą samą wartością
+        if (targetValue && targetValue !== '') {
+            highlightedValue = targetValue;
+            cells.forEach(cell => {
+                if (cell.value === targetValue) {
+                    cell.classList.add('highlighted');
                 }
-
-                // Dodaj grubsze linie dla bloków
-                const blockSize = boardSize === 9 ? 3 : 4;
-                
-                if ((r + 1) % blockSize === 0 && r !== boardSize - 1) {
-                    cell.style.borderBottom = '2px solid black';
-                }
-                if ((c + 1) % blockSize === 0 && c !== boardSize - 1) {
-                    cell.style.borderRight = '2px solid black';
-                }
-                if (r % blockSize === 0 && r !== 0) {
-                    cell.style.borderTop = '2px solid black';
-                }
-                if (c % blockSize === 0 && c !== 0) {
-                    cell.style.borderLeft = '2px solid black';
-                }
-
-                sudokuBoard.appendChild(cell);
-            }
+            });
+        } else {
+            highlightedValue = null;
         }
     }
+
+    // --- Funkcja do dodawania event listenerów do komórek ---
+    function addCellEventListeners() {
+        const cells = sudokuBoard.querySelectorAll('.cell');
+        
+        cells.forEach(cell => {
+            // Event listener dla kliknięcia
+            cell.addEventListener('click', (e) => {
+                const value = e.target.value.trim();
+                highlightSameValues(value);
+            });
+            
+            // Event listener dla zmiany wartości (gdy użytkownik wpisuje)
+            cell.addEventListener('input', (e) => {
+                // Jeśli obecnie coś jest podświetlone, sprawdź czy nowa wartość pasuje
+                if (highlightedValue) {
+                    const newValue = e.target.value.trim();
+                    if (newValue === highlightedValue) {
+                        e.target.classList.add('highlighted');
+                    } else {
+                        e.target.classList.remove('highlighted');
+                    }
+                }
+            });
+            
+            // Event listener dla focusa (gdy użytkownik kliknie w komórkę)
+            cell.addEventListener('focus', (e) => {
+                const value = e.target.value.trim();
+                if (value) {
+                    highlightSameValues(value);
+                }
+            });
+        });
+        
+        // Kliknięcie poza planszą usuwa podświetlenie
+        document.addEventListener('click', (e) => {
+            if (!sudokuBoard.contains(e.target)) {
+                highlightSameValues(null);
+            }
+        });
+    }
+
+
+    // --- Funkcja do wyświetlania planszy Sudoku na stronie ---
+    function displaySudokuBoard(board, boardSize) {
+    sudokuBoard.innerHTML = ''; // Wyczyść planszę
+    sudokuBoard.className = `sudoku-board size-${boardSize}`;
+
+    for (let r = 0; r < boardSize; r++) {
+        for (let c = 0; c < boardSize; c++) {
+            const cell = document.createElement('input');
+            cell.type = 'text';
+            cell.maxLength = 2;  // dla 16x16 możesz mieć 2 znaki, dla 9x9 wystarczy 1
+            cell.classList.add('cell');
+            
+            const value = board[r][c];
+            if (value !== 0) {
+                cell.value = value;
+                cell.readOnly = true;  // pola wstępnie wypełnione są nieedytowalne
+                cell.classList.add('given-number');
+            } else {
+                cell.value = '';
+                cell.classList.add('empty-cell');
+                cell.readOnly = false;
+            }
+
+            // Grubsze linie dla bloków
+            const blockSize = boardSize === 9 ? 3 : 4;
+
+            if ((r + 1) % blockSize === 0 && r !== boardSize - 1) {
+                cell.style.borderBottom = '2px solid black';
+            }
+            if ((c + 1) % blockSize === 0 && c !== boardSize - 1) {
+                cell.style.borderRight = '2px solid black';
+            }
+            if (r % blockSize === 0 && r !== 0) {
+                cell.style.borderTop = '2px solid black';
+            }
+            if (c % blockSize === 0 && c !== 0) {
+                cell.style.borderLeft = '2px solid black';
+            }
+
+            sudokuBoard.appendChild(cell);
+        }
+    }
+    addCellEventListeners();
+}
+
 
     // Aktualizuj informacje o grze
     function updateGameInfo(difficulty, boardSize) {
@@ -181,3 +254,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 });
+
+
+

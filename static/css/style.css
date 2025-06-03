@@ -168,3 +168,11 @@ button:hover {
 .close-modal:hover {
     background-color: #545b62;
 }
+
+#sudoku-board > * {
+    text-align: center;
+}
+
+.cell.highlighted {
+    background-color: pink !important;
+}

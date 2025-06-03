@@ -4,6 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sudoku Web App</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Dongle&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 </head>
 <body>
@@ -11,41 +14,41 @@
     <div id="game-info"></div>
 
     <div id="sudoku-board" class="sudoku-board">
-        </div>
-    <button id="new-game-btn">Nowa Gra</button>
+    </div>
+    <button id="new-game-btn">nowa gra</button>
 
     <!-- Modal z opcjami trudności -->
     <div id="difficulty-modal" class="modal">
         <div class="modal-content">
-            <h2>Wybierz poziom trudności</h2>
+            <h2>wybierz poziom trudności</h2>
             
             <div class="difficulty-options">
                 <div class="difficulty-section">
-                    <h3>Plansza 9x9</h3>
+                    <h3>plansza mała</h3>
                     <div class="difficulty-buttons">
                         <button class="difficulty-btn" data-size="9" data-difficulty="easy">
-                            Łatwa<br><small>(55% zakryte)</small>
+                            łatwa
                         </button>
                         <button class="difficulty-btn" data-size="9" data-difficulty="medium">
-                            Średnia<br><small>(65% zakryte)</small>
+                            średnia
                         </button>
                         <button class="difficulty-btn" data-size="9" data-difficulty="hard">
-                            Trudna<br><small>(75% zakryte)</small>
+                            trudna
                         </button>
                     </div>
                 </div>
                 
                 <div class="difficulty-section">
-                    <h3>Plansza 16x16</h3>
+                    <h3>plansza duża</h3>
                     <div class="difficulty-buttons">
                         <button class="difficulty-btn" data-size="16" data-difficulty="easy">
-                            Łatwa<br><small>(50% zakryte)</small>
+                            łatwa
                         </button>
                         <button class="difficulty-btn" data-size="16" data-difficulty="medium">
-                            Średnia<br><small>(60% zakryte)</small>
+                            średnia
                         </button>
                         <button class="difficulty-btn" data-size="16" data-difficulty="hard">
-                            Trudna<br><small>(70% zakryte)</small>
+                            trudna
                         </button>
                     </div>
                 </div>

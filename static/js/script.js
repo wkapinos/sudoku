@@ -15,19 +15,21 @@ document.addEventListener('DOMContentLoaded', () => {
     const DIFFICULTY_LEVELS = {
         '9': {
             'easy': 0.55,      // 55% zakryte
-            'medium': 0.65,    // 65% zakryte
-            'hard': 0.75       // 75% zakryte
+            'medium': 0.60,    // 60% zakryte
+            'hard': 0.70       // 70% zakryte
         },
         '16': {
             'easy': 0.50,      // 50% zakryte
-            'medium': 0.60,    // 60% zakryte
-            'hard': 0.70       // 70% zakryte
+            'medium': 0.55,    // 55% zakryte
+            'hard': 0.65       // 65% zakryte
         }
     };
 
     // Pokaż modal po kliknięciu "Nowa Gra"
     newGameBtn.addEventListener('click', () => {
-        modal.style.display = 'block';
+        modal.style.display = 'flex';
+        modal.style.flexDirection = 'column';
+        modal.style.justifyContent = 'center';
     });
 
     // Zamknij modal
@@ -203,7 +205,7 @@ document.addEventListener('DOMContentLoaded', () => {
         };
         
         const percentage = Math.round(DIFFICULTY_LEVELS[boardSize.toString()][difficulty] * 100);
-        gameInfo.textContent = `Aktualna gra: ${difficultyNames[difficulty]} ${boardSize}x${boardSize} (${percentage}% pól zakrytych)`;
+        gameInfo.textContent = `Aktualna gra: ${difficultyNames[difficulty]} ${boardSize}x${boardSize}`;
     }
 
     /**

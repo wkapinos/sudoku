@@ -8,9 +8,52 @@
 </head>
 <body>
     <h1>Sudoku</h1>
+    <div id="game-info"></div>
+
     <div id="sudoku-board" class="sudoku-board">
         </div>
     <button id="new-game-btn">Nowa Gra</button>
+
+    <!-- Modal z opcjami trudności -->
+    <div id="difficulty-modal" class="modal">
+        <div class="modal-content">
+            <h2>Wybierz poziom trudności</h2>
+            
+            <div class="difficulty-options">
+                <div class="difficulty-section">
+                    <h3>Plansza 9x9</h3>
+                    <div class="difficulty-buttons">
+                        <button class="difficulty-btn" data-size="9" data-difficulty="easy">
+                            Łatwa<br><small>(55% zakryte)</small>
+                        </button>
+                        <button class="difficulty-btn" data-size="9" data-difficulty="medium">
+                            Średnia<br><small>(65% zakryte)</small>
+                        </button>
+                        <button class="difficulty-btn" data-size="9" data-difficulty="hard">
+                            Trudna<br><small>(75% zakryte)</small>
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="difficulty-section">
+                    <h3>Plansza 16x16</h3>
+                    <div class="difficulty-buttons">
+                        <button class="difficulty-btn" data-size="16" data-difficulty="easy">
+                            Łatwa<br><small>(50% zakryte)</small>
+                        </button>
+                        <button class="difficulty-btn" data-size="16" data-difficulty="medium">
+                            Średnia<br><small>(60% zakryte)</small>
+                        </button>
+                        <button class="difficulty-btn" data-size="16" data-difficulty="hard">
+                            Trudna<br><small>(70% zakryte)</small>
+                        </button>
+                    </div>
+                </div>
+            </div>
+            
+            <button class="close-modal" id="close-modal">Anuluj</button>
+        </div>
+    </div>
 
     <script src="{{ url_for('static', filename='js/script.js') }}"></script>
 </body>

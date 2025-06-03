@@ -101,15 +101,23 @@ def index():
     return render_template('index.html') # Renderuje plik HTML
 
 # Nowy endpoint API do generowania planszy Sudoku
+from flask import request  # ← dodaj TYLKO JEDEN raz na górze, jeśli jeszcze nie masz
+
 @app.route('/api/sudoku', methods=['GET'])
 def get_sudoku_board():
-    # Możesz przekazać rozmiar x (np. 3 dla 9x9 Sudoku)
-    # Zmienna x w Twoim kodzie generatora to rozmiar małego kwadratu
-    # Standardowe Sudoku 9x9 to x=3
-    x_val = 3
+    size_param = request.args.get('size', '9')
+
+    if size_param == '9':
+        x_val = 3
+    elif size_param == '16':
+        x_val = 4
+    else:
+        return jsonify({'error': 'Nieobsługiwany rozmiar planszy'}), 400
+
     generated_board = sudokuGenerator(x_val)
-    # Zwracamy planszę jako JSON
     return jsonify(generated_board)
+
+
 
 
 if __name__ == '__main__':

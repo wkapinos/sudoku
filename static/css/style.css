@@ -14,67 +14,54 @@ h1 {
     margin-bottom: 20px;
 }
 
+.current-game-info {
+    text-align: center;
+    margin-bottom: 15px;
+    color: #666;
+    font-size: 0.9em;
+}
+
 .sudoku-board {
     display: grid;
-    /* Tworzymy siatkę 9x9 */
+    gap: 1px;
+    background-color: #333;
+    border: 2px solid #000;
+    box-shadow: 2px 2px 5px rgba(0,0,0,0.3);
+    margin-bottom: 20px;
+}
+
+.sudoku-board.size-9 {
     grid-template-columns: repeat(9, 40px);
     grid-template-rows: repeat(9, 40px);
-    gap: 1px; /* mała przerwa między komórkami */
-    background-color: #333; /* kolor linii między komórkami */
-    border: 2px solid #000; /* grubsza ramka wokół planszy */
-    box-shadow: 2px 2px 5px rgba(0,0,0,0.3);
+}
+
+.sudoku-board.size-16 {
+    grid-template-columns: repeat(16, 30px);
+    grid-template-rows: repeat(16, 30px);
 }
 
 .cell {
-    width: 40px;
-    height: 40px;
     background-color: #fff;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 1.2em;
     font-weight: bold;
     color: #000;
-    border: 0.5px solid #bbb; /* cienkie linie wewnątrz kwadratów */
-    box-sizing: border-box; /* aby padding i border nie powiększały elementu */
+    border: 0.5px solid #bbb;
+    box-sizing: border-box;
 }
 
-/* Grubsze linie dla kwadratów 3x3 */
-.cell:nth-child(3n) {
-    border-right: 2px solid #000;
-}
-.cell:nth-child(n+1):nth-child(-n+9):nth-child(3n+1) { /* Pierwsze 3 komórki w wierszu, które są ostatnie w kwadracie */
-    border-right: 2px solid #000;
+.sudoku-board.size-9 .cell {
+    width: 40px;
+    height: 40px;
+    font-size: 1.2em;
 }
 
-.cell:nth-child(27n + 1), .cell:nth-child(27n + 2), .cell:nth-child(27n + 3),
-.cell:nth-child(27n + 4), .cell:nth-child(27n + 5), .cell:nth-child(27n + 6),
-.cell:nth-child(27n + 7), .cell:nth-child(27n + 8), .cell:nth-child(27n + 9) {
-    border-bottom: 2px solid #000;
+.sudoku-board.size-16 .cell {
+    width: 30px;
+    height: 30px;
+    font-size: 0.9em;
 }
-
-.cell:nth-child(9n+1):nth-child(n+1):nth-child(-n+81) { /* Każda 9 komórka to początek nowego wiersza */
-    border-left: none; /* Usuń lewą ramkę, która jest na początku wiersza */
-}
-
-/* Dostosowanie ramki dla wierszy 3, 6 */
-.cell:nth-child(27n+1):nth-child(-n+81) { /* Cells in the 3rd, 6th row of blocks */
-    border-bottom: 2px solid #000;
-}
-
-/* Dodatkowe linie dla bloków 3x3 */
-/* Co 3 wiersz */
-.sudoku-board div:nth-child(n) {
-    border-top: none;
-}
-.sudoku-board div:nth-child(27n+1):nth-child(-n+81) {
-    border-top: 2px solid #000;
-}
-/* Komórki początkowe w co trzecim bloku wierszy */
-.sudoku-board div:nth-child(1), .sudoku-board div:nth-child(28), .sudoku-board div:nth-child(55) {
-    border-top: 2px solid #000;
-}
-
 
 /* Komórki, które są podawane (nie są do zmiany przez gracza) */
 .given-number {
@@ -93,7 +80,7 @@ h1 {
 }
 
 button {
-    margin-top: 20px;
+    margin: 10px;
     padding: 10px 20px;
     font-size: 1.1em;
     cursor: pointer;
@@ -106,4 +93,78 @@ button {
 
 button:hover {
     background-color: #0056b3;
+}
+
+/* Modal styles */
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0,0,0,0.5);
+}
+
+.modal-content {
+    background-color: white;
+    margin: 15% auto;
+    padding: 30px;
+    border-radius: 10px;
+    width: 400px;
+    max-width: 90%;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.modal h2 {
+    text-align: center;
+    color: #333;
+    margin-bottom: 30px;
+}
+
+.difficulty-options {
+    display: grid;
+    gap: 15px;
+}
+
+.difficulty-section {
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 20px;
+    background-color: #f9f9f9;
+}
+
+.difficulty-section h3 {
+    margin: 0 0 15px 0;
+    color: #555;
+    text-align: center;
+}
+
+.difficulty-buttons {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+}
+
+.difficulty-btn {
+    padding: 12px 8px;
+    font-size: 0.95em;
+    background-color: #28a745;
+    border-radius: 5px;
+    text-align: center;
+}
+
+.difficulty-btn:hover {
+    background-color: #218838;
+}
+
+.close-modal {
+    background-color: #6c757d;
+    margin-top: 20px;
+    width: 100%;
+}
+
+.close-modal:hover {
+    background-color: #545b62;
 }

@@ -412,4 +412,12 @@ def get_user_stats():
 
 if __name__ == '__main__':
     init_db()  # Utwórz tabele jeśli nie istnieją
-    app.run(debug=True)
+    
+    # Sprawdź czy jesteś na Railway czy lokalnie
+    if os.environ.get('RAILWAY_ENVIRONMENT'):
+        # Railway deployment
+        port = int(os.environ.get('PORT', 5000))
+        app.run(host='::', port=port, debug=False)
+    else:
+        # Lokalne uruchomienie
+        app.run(debug=True)

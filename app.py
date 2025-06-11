@@ -213,11 +213,14 @@ def sudokuGenerator(x):
 
 #     # === ROUTES ===
 
+@app.route('/health')
+def health():
+    return "OK", 200
+
 @app.route('/')
 def index():
     # TYMCZASOWO BEZ LOGOWANIA - test deployment
     return render_template('index.html', user={'username': 'Test'})
-
 
 # @app.route('/')
 # def index():

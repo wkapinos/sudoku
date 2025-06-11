@@ -9,11 +9,8 @@ from functools import wraps
 app = Flask(__name__)
 
 # Konfiguracja aplikacji
-app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'twoj-super-tajny-klucz-dev')
-database_url = os.environ.get('DATABASE_URL')
-if database_url and database_url.startswith('postgres://'):
-    database_url = database_url.replace('postgres://', 'postgresql://', 1)
-app.config['SQLALCHEMY_DATABASE_URI'] = database_url or 'sqlite:///database.db'
+app.config['SECRET_KEY'] = 'moj-lokalny-tajny-klucz-123'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///database.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 # Inicjalizacja rozszerzeń
@@ -415,6 +412,7 @@ def get_user_stats():
         'completion_rate': round(completed_games / total_games * 100, 1) if total_games > 0 else 0,
         'best_times': best_times
     })
+
 
 if __name__ == '__main__':
     init_db()  # Utwórz tabele jeśli nie istnieją

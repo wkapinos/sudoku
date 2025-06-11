@@ -215,6 +215,10 @@ def sudokuGenerator(x):
 #     app.run(debug=True)
 
     # === ROUTES ===
+@app.route('/health')
+def health():
+    return {'status': 'ok', 'message': 'App is running'}, 200
+
 
 @app.route('/')
 def index():
@@ -415,4 +419,5 @@ def get_user_stats():
 if __name__ == '__main__':
     init_db()  # Utwórz tabele jeśli nie istnieją
     port = int(os.environ.get('PORT', 5000))
+    print(f"Starting app on port {port}") 
     app.run(host='0.0.0.0', port=port, debug=False)

@@ -211,203 +211,209 @@ def sudokuGenerator(x):
 # if __name__ == '__main__':
 #     app.run(debug=True)
 
-    # === ROUTES ===
+#     # === ROUTES ===
 
 @app.route('/')
 def index():
-    # Sprawdź czy użytkownik jest zalogowany
-    if 'user_id' not in session:
-        return redirect(url_for('login'))
-    
-    user = User.query.get(session['user_id'])
-    return render_template('index.html', user=user)
+    # TYMCZASOWO BEZ LOGOWANIA - test deployment
+    return render_template('index.html', user={'username': 'Test'})
 
-@app.route('/register', methods=['GET', 'POST'])
-def register():
-    if request.method == 'POST':
-        username = request.form.get('username')
-        email = request.form.get('email')
-        password = request.form.get('password')
-        password_confirm = request.form.get('password_confirm')
-        
-        # Walidacja
-        if not username or not email or not password:
-            flash('Wszystkie pola są wymagane!', 'error')
-            return render_template('register.html')
-        
-        if password != password_confirm:
-            flash('Hasła nie są identyczne!', 'error')
-            return render_template('register.html')
-        
-        if len(password) < 6:
-            flash('Hasło musi mieć przynajmniej 6 znaków!', 'error')
-            return render_template('register.html')
-        
-        # Sprawdź czy użytkownik już istnieje
-        if User.query.filter_by(username=username).first():
-            flash('Nazwa użytkownika już zajęta!', 'error')
-            return render_template('register.html')
-        
-        if User.query.filter_by(email=email).first():
-            flash('Email już zarejestrowany!', 'error')
-            return render_template('register.html')
-        
-        # Utwórz nowego użytkownika
-        user = User(username=username, email=email)
-        user.set_password(password)
-        
-        try:
-            db.session.add(user)
-            db.session.commit()
-            flash('Konto utworzone pomyślnie! Możesz się teraz zalogować.', 'success')
-            return redirect(url_for('login'))
-        except Exception as e:
-            db.session.rollback()
-            flash('Wystąpił błąd podczas tworzenia konta.', 'error')
-            return render_template('register.html')
-    
-    return render_template('register.html')
 
-@app.route('/login', methods=['GET', 'POST'])
-def login():
-    if request.method == 'POST':
-        username = request.form.get('username')
-        password = request.form.get('password')
-        
-        if not username or not password:
-            flash('Podaj nazwę użytkownika i hasło!', 'error')
-            return render_template('login.html')
-        
-        user = User.query.filter_by(username=username).first()
-        
-        if user and user.check_password(password):
-            session['user_id'] = user.id
-            session['username'] = user.username
-            flash(f'Witaj, {user.username}!', 'success')
-            return redirect(url_for('index'))
-        else:
-            flash('Nieprawidłowa nazwa użytkownika lub hasło!', 'error')
-            return render_template('login.html')
+# @app.route('/')
+# def index():
+#     # Sprawdź czy użytkownik jest zalogowany
+#     if 'user_id' not in session:
+#         return redirect(url_for('login'))
     
-    return render_template('login.html')
+#     user = User.query.get(session['user_id'])
+#     return render_template('index.html', user=user)
 
-@app.route('/logout')
-def logout():
-    session.clear()
-    flash('Zostałeś wylogowany.', 'info')
-    return redirect(url_for('login'))
-
-@app.route('/api/sudoku', methods=['GET'])
-@login_required
-def get_sudoku_board():
-    size_param = request.args.get('size', '9')
-    
-    if size_param == '9':
-        x_val = 3
-    elif size_param == '16':
-        x_val = 4
-    else:
-        return jsonify({'error': 'Nieobsługiwany rozmiar planszy'}), 400
-    
-    generated_board = sudokuGenerator(x_val)
-    return jsonify(generated_board)
-
-@app.route('/api/start_game', methods=['POST'])
-@login_required
-def start_game():
-    """Rozpoczyna nową grę"""
-    data = request.get_json()
-    
-    game = SudokuGame(
-        user_id=session['user_id'],
-        board_size=data.get('board_size'),
-        difficulty=data.get('difficulty'),
-        status='started'
-    )
-    
-    try:
-        db.session.add(game)
-        db.session.commit()
-        return jsonify({'success': True, 'game_id': game.id})
-    except Exception as e:
-        db.session.rollback()
-        return jsonify({'error': 'Nie udało się rozpocząć gry'}), 500
-
-@app.route('/api/finish_game', methods=['POST'])
-@login_required
-def finish_game():
-    """Kończy grę - sukces, porażka lub poddanie"""
-    data = request.get_json()
-    game_id = data.get('game_id')
-    status = data.get('status')  # 'completed', 'abandoned', 'failed'
-    time_seconds = data.get('time_seconds')
-    moves_count = data.get('moves_count', 0)
-    
-    game = SudokuGame.query.filter_by(id=game_id, user_id=session['user_id']).first()
-    if not game:
-        return jsonify({'error': 'Gra nie znaleziona'}), 404
-    
-    game.status = status
-    game.finished_at = datetime.utcnow()
-    game.moves_count = moves_count
-    
-    if status == 'completed' and time_seconds:
-        game.time_seconds = time_seconds
+# @app.route('/register', methods=['GET', 'POST'])
+# def register():
+#     if request.method == 'POST':
+#         username = request.form.get('username')
+#         email = request.form.get('email')
+#         password = request.form.get('password')
+#         password_confirm = request.form.get('password_confirm')
         
-        # Sprawdź czy to nowy rekord
-        existing_best = SudokuBestScore.query.filter_by(
-            user_id=session['user_id'],
-            board_size=game.board_size,
-            difficulty=game.difficulty
-        ).first()
+#         # Walidacja
+#         if not username or not email or not password:
+#             flash('Wszystkie pola są wymagane!', 'error')
+#             return render_template('register.html')
         
-        if not existing_best or time_seconds < existing_best.best_time_seconds:
-            if existing_best:
-                existing_best.best_time_seconds = time_seconds
-                existing_best.achieved_at = datetime.utcnow()
-                existing_best.game_id = game.id
-            else:
-                new_best = SudokuBestScore(
-                    user_id=session['user_id'],
-                    board_size=game.board_size,
-                    difficulty=game.difficulty,
-                    best_time_seconds=time_seconds,
-                    game_id=game.id
-                )
-                db.session.add(new_best)
+#         if password != password_confirm:
+#             flash('Hasła nie są identyczne!', 'error')
+#             return render_template('register.html')
+        
+#         if len(password) < 6:
+#             flash('Hasło musi mieć przynajmniej 6 znaków!', 'error')
+#             return render_template('register.html')
+        
+#         # Sprawdź czy użytkownik już istnieje
+#         if User.query.filter_by(username=username).first():
+#             flash('Nazwa użytkownika już zajęta!', 'error')
+#             return render_template('register.html')
+        
+#         if User.query.filter_by(email=email).first():
+#             flash('Email już zarejestrowany!', 'error')
+#             return render_template('register.html')
+        
+#         # Utwórz nowego użytkownika
+#         user = User(username=username, email=email)
+#         user.set_password(password)
+        
+#         try:
+#             db.session.add(user)
+#             db.session.commit()
+#             flash('Konto utworzone pomyślnie! Możesz się teraz zalogować.', 'success')
+#             return redirect(url_for('login'))
+#         except Exception as e:
+#             db.session.rollback()
+#             flash('Wystąpił błąd podczas tworzenia konta.', 'error')
+#             return render_template('register.html')
     
-    try:
-        db.session.commit()
-        return jsonify({'success': True})
-    except Exception as e:
-        db.session.rollback()
-        return jsonify({'error': 'Nie udało się zapisać wyniku'}), 500
+#     return render_template('register.html')
 
-@app.route('/api/user_stats')
-@login_required
-def get_user_stats():
-    """Zwraca statystyki użytkownika"""
-    user_id = session['user_id']
+# @app.route('/login', methods=['GET', 'POST'])
+# def login():
+#     if request.method == 'POST':
+#         username = request.form.get('username')
+#         password = request.form.get('password')
+        
+#         if not username or not password:
+#             flash('Podaj nazwę użytkownika i hasło!', 'error')
+#             return render_template('login.html')
+        
+#         user = User.query.filter_by(username=username).first()
+        
+#         if user and user.check_password(password):
+#             session['user_id'] = user.id
+#             session['username'] = user.username
+#             flash(f'Witaj, {user.username}!', 'success')
+#             return redirect(url_for('index'))
+#         else:
+#             flash('Nieprawidłowa nazwa użytkownika lub hasło!', 'error')
+#             return render_template('login.html')
     
-    # Ogólne statystyki
-    total_games = SudokuGame.query.filter_by(user_id=user_id).count()
-    completed_games = SudokuGame.query.filter_by(user_id=user_id, status='completed').count()
-    abandoned_games = SudokuGame.query.filter_by(user_id=user_id, status='abandoned').count()
+#     return render_template('login.html')
+
+# @app.route('/logout')
+# def logout():
+#     session.clear()
+#     flash('Zostałeś wylogowany.', 'info')
+#     return redirect(url_for('login'))
+
+# @app.route('/api/sudoku', methods=['GET'])
+# @login_required
+# def get_sudoku_board():
+#     size_param = request.args.get('size', '9')
     
-    # Najlepsze czasy
-    best_scores = SudokuBestScore.query.filter_by(user_id=user_id).all()
-    best_times = {}
-    for score in best_scores:
-        key = f"{score.board_size}_{score.difficulty}"
-        best_times[key] = score.best_time_seconds
+#     if size_param == '9':
+#         x_val = 3
+#     elif size_param == '16':
+#         x_val = 4
+#     else:
+#         return jsonify({'error': 'Nieobsługiwany rozmiar planszy'}), 400
     
-    return jsonify({
-        'total_games': total_games,
-        'completed_games': completed_games,
-        'abandoned_games': abandoned_games,
-        'completion_rate': round(completed_games / total_games * 100, 1) if total_games > 0 else 0,
-        'best_times': best_times
-    })
+#     generated_board = sudokuGenerator(x_val)
+#     return jsonify(generated_board)
+
+# @app.route('/api/start_game', methods=['POST'])
+# @login_required
+# def start_game():
+#     """Rozpoczyna nową grę"""
+#     data = request.get_json()
+    
+#     game = SudokuGame(
+#         user_id=session['user_id'],
+#         board_size=data.get('board_size'),
+#         difficulty=data.get('difficulty'),
+#         status='started'
+#     )
+    
+#     try:
+#         db.session.add(game)
+#         db.session.commit()
+#         return jsonify({'success': True, 'game_id': game.id})
+#     except Exception as e:
+#         db.session.rollback()
+#         return jsonify({'error': 'Nie udało się rozpocząć gry'}), 500
+
+# @app.route('/api/finish_game', methods=['POST'])
+# @login_required
+# def finish_game():
+#     """Kończy grę - sukces, porażka lub poddanie"""
+#     data = request.get_json()
+#     game_id = data.get('game_id')
+#     status = data.get('status')  # 'completed', 'abandoned', 'failed'
+#     time_seconds = data.get('time_seconds')
+#     moves_count = data.get('moves_count', 0)
+    
+#     game = SudokuGame.query.filter_by(id=game_id, user_id=session['user_id']).first()
+#     if not game:
+#         return jsonify({'error': 'Gra nie znaleziona'}), 404
+    
+#     game.status = status
+#     game.finished_at = datetime.utcnow()
+#     game.moves_count = moves_count
+    
+#     if status == 'completed' and time_seconds:
+#         game.time_seconds = time_seconds
+        
+#         # Sprawdź czy to nowy rekord
+#         existing_best = SudokuBestScore.query.filter_by(
+#             user_id=session['user_id'],
+#             board_size=game.board_size,
+#             difficulty=game.difficulty
+#         ).first()
+        
+#         if not existing_best or time_seconds < existing_best.best_time_seconds:
+#             if existing_best:
+#                 existing_best.best_time_seconds = time_seconds
+#                 existing_best.achieved_at = datetime.utcnow()
+#                 existing_best.game_id = game.id
+#             else:
+#                 new_best = SudokuBestScore(
+#                     user_id=session['user_id'],
+#                     board_size=game.board_size,
+#                     difficulty=game.difficulty,
+#                     best_time_seconds=time_seconds,
+#                     game_id=game.id
+#                 )
+#                 db.session.add(new_best)
+    
+#     try:
+#         db.session.commit()
+#         return jsonify({'success': True})
+#     except Exception as e:
+#         db.session.rollback()
+#         return jsonify({'error': 'Nie udało się zapisać wyniku'}), 500
+
+# @app.route('/api/user_stats')
+# @login_required
+# def get_user_stats():
+#     """Zwraca statystyki użytkownika"""
+#     user_id = session['user_id']
+    
+#     # Ogólne statystyki
+#     total_games = SudokuGame.query.filter_by(user_id=user_id).count()
+#     completed_games = SudokuGame.query.filter_by(user_id=user_id, status='completed').count()
+#     abandoned_games = SudokuGame.query.filter_by(user_id=user_id, status='abandoned').count()
+    
+#     # Najlepsze czasy
+#     best_scores = SudokuBestScore.query.filter_by(user_id=user_id).all()
+#     best_times = {}
+#     for score in best_scores:
+#         key = f"{score.board_size}_{score.difficulty}"
+#         best_times[key] = score.best_time_seconds
+    
+#     return jsonify({
+#         'total_games': total_games,
+#         'completed_games': completed_games,
+#         'abandoned_games': abandoned_games,
+#         'completion_rate': round(completed_games / total_games * 100, 1) if total_games > 0 else 0,
+#         'best_times': best_times
+#     })
 
 if __name__ == '__main__':
     print("Uruchamianie aplikacji...")

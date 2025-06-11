@@ -1,7 +1,6 @@
 from flask import Flask, render_template, request, jsonify, redirect, url_for, flash, session
 from flask_sqlalchemy import SQLAlchemy
 from flask_bcrypt import Bcrypt
-from flask_jwt_extended import JWTManager, create_access_token, jwt_required, get_jwt_identity
 import os
 import random
 from datetime import datetime
@@ -412,12 +411,5 @@ def get_user_stats():
 
 if __name__ == '__main__':
     init_db()  # Utwórz tabele jeśli nie istnieją
-    
-    # Sprawdź czy jesteś na Railway czy lokalnie
-    if os.environ.get('RAILWAY_ENVIRONMENT'):
-        # Railway deployment
-        port = int(os.environ.get('PORT', 5000))
-        app.run(host='::', port=port, debug=False)
-    else:
-        # Lokalne uruchomienie
-        app.run(debug=True)
+    port = int(os.environ.get('PORT', 5000))
+    app.run(host='::', port=port, debug=False)

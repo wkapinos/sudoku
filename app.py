@@ -411,4 +411,4 @@ def get_user_stats():
 
 if __name__ == '__main__':
     init_db()  # Utwórz tabele jeśli nie istnieją
-    app.run(debug=True)
+    app.run(host='0.0.0.0', port=port, debug=False)

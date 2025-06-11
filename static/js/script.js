@@ -9,7 +9,14 @@ document.addEventListener('DOMContentLoaded', () => {
     let currentBoard = [];
     let currentSize = 9;
     let currentDifficulty = 'medium';
-    let highlightedValue = null; // Przechowuje aktualnie podświetlaną wartość
+    let highlightedValue = null;
+    
+    // === NOWE ZMIENNE DO TRACKINGU GIER ===
+    let currentGameId = null;
+    let gameStartTime = null;
+    let movesCount = 0;
+    let gameTimer = null;
+    let gameActive = false;
 
     // Definicje poziomów trudności
     const DIFFICULTY_LEVELS = {
@@ -25,8 +32,230 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     };
 
+    // === FUNKCJE TRACKINGU GIER ===
+    
+    async function startGameTracking(boardSize, difficulty) {
+        try {
+            const response = await fetch('/api/start_game', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    board_size: boardSize,
+                    difficulty: difficulty
+                })
+            });
+            
+            const data = await response.json();
+            if (data.success) {
+                currentGameId = data.game_id;
+                gameStartTime = Date.now();
+                movesCount = 0;
+                gameActive = true;
+                startTimer();
+                console.log(`Rozpoczęto grę ID: ${currentGameId}`);
+            }
+        } catch (error) {
+            console.error('Błąd podczas rozpoczynania trackingu gry:', error);
+        }
+    }
+    
+    async function finishGameTracking(status, timeSeconds = null) {
+        if (!currentGameId || !gameActive) return;
+        
+        try {
+            const response = await fetch('/api/finish_game', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    game_id: currentGameId,
+                    status: status,
+                    time_seconds: timeSeconds,
+                    moves_count: movesCount
+                })
+            });
+            
+            const data = await response.json();
+            if (data.success) {
+                gameActive = false;
+                stopTimer();
+                console.log(`Zakończono grę ze statusem: ${status}`);
+                
+                if (status === 'completed') {
+                    showCompletionMessage(timeSeconds);
+                }
+            }
+        } catch (error) {
+            console.error('Błąd podczas kończenia gry:', error);
+        }
+    }
+    
+    function startTimer() {
+        stopTimer(); // Zatrzymaj poprzedni timer jeśli istnieje
+        gameTimer = setInterval(updateTimerDisplay, 1000);
+    }
+    
+    function stopTimer() {
+        if (gameTimer) {
+            clearInterval(gameTimer);
+            gameTimer = null;
+        }
+    }
+    
+    function updateTimerDisplay() {
+        if (!gameStartTime || !gameActive) return;
+        
+        const elapsed = Math.floor((Date.now() - gameStartTime) / 1000);
+        const minutes = Math.floor(elapsed / 60);
+        const seconds = elapsed % 60;
+        
+        // Znajdź lub utwórz element timera
+        let timerElement = document.getElementById('game-timer');
+        if (!timerElement) {
+            timerElement = document.createElement('div');
+            timerElement.id = 'game-timer';
+            timerElement.style.cssText = 'position: absolute; top: 20px; left: 20px; background: rgba(255,255,255,0.9); padding: 10px; border-radius: 5px; font-weight: bold;';
+            document.body.appendChild(timerElement);
+        }
+        
+        timerElement.textContent = `Czas: ${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+    }
+    
+    function showCompletionMessage(timeSeconds) {
+        const minutes = Math.floor(timeSeconds / 60);
+        const seconds = timeSeconds % 60;
+        const timeStr = `${minutes}:${seconds.toString().padStart(2, '0')}`;
+        
+        alert(`🎉 Gratulacje! Ukończyłeś Sudoku w czasie: ${timeStr}!`);
+    }
+    
+    function checkGameCompletion() {
+        if (!gameActive) return;
+        
+        const cells = sudokuBoard.querySelectorAll('.cell');
+        let allFilled = true;
+        let isValid = true;
+        
+        // Sprawdź czy wszystkie pola są wypełnione
+        cells.forEach(cell => {
+            if (cell.value.trim() === '') {
+                allFilled = false;
+            }
+        });
+        
+        if (!allFilled) return;
+        
+        // Sprawdź poprawność rozwiązania
+        isValid = validateSudoku();
+        
+        if (isValid) {
+            const timeSeconds = Math.floor((Date.now() - gameStartTime) / 1000);
+            finishGameTracking('completed', timeSeconds);
+        } else {
+            // Opcjonalnie: możesz dodać info o błędzie
+            console.log('Sudoku wypełnione ale niepoprawnie');
+        }
+    }
+    
+    function validateSudoku() {
+        const cells = sudokuBoard.querySelectorAll('.cell');
+        const board = [];
+        
+        // Przekształć komórki z powrotem na tablicę 2D
+        for (let i = 0; i < currentSize; i++) {
+            board[i] = [];
+            for (let j = 0; j < currentSize; j++) {
+                const cellIndex = i * currentSize + j;
+                const value = parseInt(cells[cellIndex].value) || 0;
+                board[i][j] = value;
+            }
+        }
+        
+        // Sprawdź wiersze, kolumny i bloki
+        return isValidSudoku(board, currentSize);
+    }
+    
+    function isValidSudoku(board, size) {
+        const blockSize = size === 9 ? 3 : 4;
+        
+        // Sprawdź wiersze
+        for (let row = 0; row < size; row++) {
+            const seen = new Set();
+            for (let col = 0; col < size; col++) {
+                const val = board[row][col];
+                if (val !== 0) {
+                    if (seen.has(val)) return false;
+                    seen.add(val);
+                }
+            }
+        }
+        
+        // Sprawdź kolumny
+        for (let col = 0; col < size; col++) {
+            const seen = new Set();
+            for (let row = 0; row < size; row++) {
+                const val = board[row][col];
+                if (val !== 0) {
+                    if (seen.has(val)) return false;
+                    seen.add(val);
+                }
+            }
+        }
+        
+        // Sprawdź bloki
+        for (let blockRow = 0; blockRow < size; blockRow += blockSize) {
+            for (let blockCol = 0; blockCol < size; blockCol += blockSize) {
+                const seen = new Set();
+                for (let row = blockRow; row < blockRow + blockSize; row++) {
+                    for (let col = blockCol; col < blockCol + blockSize; col++) {
+                        const val = board[row][col];
+                        if (val !== 0) {
+                            if (seen.has(val)) return false;
+                            seen.add(val);
+                        }
+                    }
+                }
+            }
+        }
+        
+        return true;
+    }
+
+    // === DODAJ PRZYCISK PODDANIA SIĘ ===
+    function addGiveUpButton() {
+        let giveUpBtn = document.getElementById('give-up-btn');
+        if (!giveUpBtn) {
+            giveUpBtn = document.createElement('button');
+            giveUpBtn.id = 'give-up-btn';
+            giveUpBtn.textContent = 'Poddaj się';
+            giveUpBtn.style.cssText = 'margin-left: 10px; background: #dc3545; color: white; padding: 10px 15px; border: none; border-radius: 5px; cursor: pointer;';
+            newGameBtn.parentNode.insertBefore(giveUpBtn, newGameBtn.nextSibling);
+            
+            giveUpBtn.addEventListener('click', () => {
+                if (gameActive && confirm('Czy na pewno chcesz się poddać?')) {
+                    finishGameTracking('abandoned');
+                }
+            });
+        }
+        giveUpBtn.style.display = gameActive ? 'inline-block' : 'none';
+    }
+
+    // === EXISTING CODE Z MODYFIKACJAMI ===
+
     // Pokaż modal po kliknięciu "Nowa Gra"
     newGameBtn.addEventListener('click', () => {
+        // Jeśli gra jest aktywna, zapytaj o poddanie się
+        if (gameActive) {
+            if (confirm('Rozpocząć nową grę? Obecna gra zostanie przerwana.')) {
+                finishGameTracking('abandoned');
+            } else {
+                return;
+            }
+        }
+        
         modal.style.display = 'flex';
         modal.style.flexDirection = 'column';
         modal.style.justifyContent = 'center';
@@ -61,6 +290,9 @@ document.addEventListener('DOMContentLoaded', () => {
     // --- Funkcja do pobierania planszy Sudoku z backendu ---
     async function fetchSudokuBoard(difficulty = 'medium', boardSize = 9) {
         try {
+            // Rozpocznij tracking nowej gry
+            await startGameTracking(boardSize, difficulty);
+            
             const response = await fetch(`/api/sudoku?size=${boardSize}`);
             if (!response.ok) {
                 throw new Error(`HTTP error! status: ${response.status}`);
@@ -73,14 +305,14 @@ document.addEventListener('DOMContentLoaded', () => {
             currentBoard = puzzle;
             displaySudokuBoard(puzzle, boardSize);
             updateGameInfo(difficulty, boardSize);
+            addGiveUpButton();
         } catch (error) {
             console.error('Błąd podczas pobierania planszy Sudoku:', error);
             alert('Nie udało się załadować planszy Sudoku. Spróbuj ponownie później.');
         }
     }
 
-    
-      // --- Funkcja do podświetlania komórek z tą samą wartością ---
+    // --- Funkcja do podświetlania komórek z tą samą wartością ---
     function highlightSameValues(targetValue) {
         const cells = sudokuBoard.querySelectorAll('.cell');
         
@@ -88,12 +320,6 @@ document.addEventListener('DOMContentLoaded', () => {
         cells.forEach(cell => {
             cell.classList.remove('highlighted');
         });
-        
-        // Jeśli kliknięto na tę samą wartość, wyłącz podświetlanie
-        // if (highlightedValue === targetValue) {
-        //     highlightedValue = null;
-        //     return;
-        // }
         
         // Podświetl komórki z tą samą wartością
         if (targetValue && targetValue !== '') {
@@ -121,7 +347,21 @@ document.addEventListener('DOMContentLoaded', () => {
             
             // Event listener dla zmiany wartości (gdy użytkownik wpisuje)
             cell.addEventListener('input', (e) => {
-                // Jeśli obecnie coś jest podświetlone, sprawdź czy nowa wartość pasuje
+                // Zwiększ licznik ruchów tylko dla edytowalnych pól
+                if (!e.target.readOnly && gameActive) {
+                    movesCount++;
+                }
+                
+                // Walidacja wprowadzanej wartości
+                const maxValue = currentSize;
+                const value = parseInt(e.target.value);
+                
+                if (e.target.value !== '' && (isNaN(value) || value < 1 || value > maxValue)) {
+                    e.target.value = '';
+                    return;
+                }
+                
+                // Podświetlanie
                 if (highlightedValue) {
                     const newValue = e.target.value.trim();
                     if (newValue === highlightedValue) {
@@ -130,9 +370,12 @@ document.addEventListener('DOMContentLoaded', () => {
                         e.target.classList.remove('highlighted');
                     }
                 }
+                
+                // Sprawdź czy gra została ukończona
+                setTimeout(checkGameCompletion, 100);
             });
             
-            // Event listener dla focusa (gdy użytkownik kliknie w komórkę)
+            // Event listener dla focusa
             cell.addEventListener('focus', (e) => {
                 const value = e.target.value.trim();
                 if (value) {
@@ -149,52 +392,50 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-
     // --- Funkcja do wyświetlania planszy Sudoku na stronie ---
     function displaySudokuBoard(board, boardSize) {
-    sudokuBoard.innerHTML = ''; // Wyczyść planszę
-    sudokuBoard.className = `sudoku-board size-${boardSize}`;
+        sudokuBoard.innerHTML = ''; // Wyczyść planszę
+        sudokuBoard.className = `sudoku-board size-${boardSize}`;
 
-    for (let r = 0; r < boardSize; r++) {
-        for (let c = 0; c < boardSize; c++) {
-            const cell = document.createElement('input');
-            cell.type = 'text';
-            cell.maxLength = 2;  // dla 16x16 możesz mieć 2 znaki, dla 9x9 wystarczy 1
-            cell.classList.add('cell');
-            
-            const value = board[r][c];
-            if (value !== 0) {
-                cell.value = value;
-                cell.readOnly = true;  // pola wstępnie wypełnione są nieedytowalne
-                cell.classList.add('given-number');
-            } else {
-                cell.value = '';
-                cell.classList.add('empty-cell');
-                cell.readOnly = false;
-            }
+        for (let r = 0; r < boardSize; r++) {
+            for (let c = 0; c < boardSize; c++) {
+                const cell = document.createElement('input');
+                cell.type = 'text';
+                cell.maxLength = 2;  // dla 16x16 możesz mieć 2 znaki, dla 9x9 wystarczy 1
+                cell.classList.add('cell');
+                
+                const value = board[r][c];
+                if (value !== 0) {
+                    cell.value = value;
+                    cell.readOnly = true;  // pola wstępnie wypełnione są nieedytowalne
+                    cell.classList.add('given-number');
+                } else {
+                    cell.value = '';
+                    cell.classList.add('empty-cell');
+                    cell.readOnly = false;
+                }
 
-            // Grubsze linie dla bloków
-            const blockSize = boardSize === 9 ? 3 : 4;
+                // Grubsze linie dla bloków
+                const blockSize = boardSize === 9 ? 3 : 4;
 
-            if ((r + 1) % blockSize === 0 && r !== boardSize - 1) {
-                cell.style.borderBottom = '2px solid black';
-            }
-            if ((c + 1) % blockSize === 0 && c !== boardSize - 1) {
-                cell.style.borderRight = '2px solid black';
-            }
-            if (r % blockSize === 0 && r !== 0) {
-                cell.style.borderTop = '2px solid black';
-            }
-            if (c % blockSize === 0 && c !== 0) {
-                cell.style.borderLeft = '2px solid black';
-            }
+                if ((r + 1) % blockSize === 0 && r !== boardSize - 1) {
+                    cell.style.borderBottom = '2px solid black';
+                }
+                if ((c + 1) % blockSize === 0 && c !== boardSize - 1) {
+                    cell.style.borderRight = '2px solid black';
+                }
+                if (r % blockSize === 0 && r !== 0) {
+                    cell.style.borderTop = '2px solid black';
+                }
+                if (c % blockSize === 0 && c !== 0) {
+                    cell.style.borderLeft = '2px solid black';
+                }
 
-            sudokuBoard.appendChild(cell);
+                sudokuBoard.appendChild(cell);
+            }
         }
+        addCellEventListeners();
     }
-    addCellEventListeners();
-}
-
 
     // Aktualizuj informacje o grze
     function updateGameInfo(difficulty, boardSize) {
@@ -205,7 +446,18 @@ document.addEventListener('DOMContentLoaded', () => {
         };
         
         const percentage = Math.round(DIFFICULTY_LEVELS[boardSize.toString()][difficulty] * 100);
-        gameInfo.textContent = `Aktualna gra: ${difficultyNames[difficulty]} ${boardSize}x${boardSize}`;
+        gameInfo.innerHTML = `
+            <div>Aktualna gra: ${difficultyNames[difficulty]} ${boardSize}x${boardSize}</div>
+            <div style="font-size: 0.9em; color: #666;">Ruchy: <span id="moves-counter">0</span></div>
+        `;
+        
+        // Aktualizuj licznik ruchów co sekundę
+        setInterval(() => {
+            const movesCounter = document.getElementById('moves-counter');
+            if (movesCounter) {
+                movesCounter.textContent = movesCount;
+            }
+        }, 500);
     }
 
     /**
@@ -255,7 +507,13 @@ document.addEventListener('DOMContentLoaded', () => {
             [array[i], array[j]] = [array[j], array[i]];
         }
     }
+    
+    // === Obsługa zamykania/odświeżania strony ===
+    window.addEventListener('beforeunload', (e) => {
+        if (gameActive) {
+            finishGameTracking('abandoned');
+            e.preventDefault();
+            e.returnValue = ''; // Pokaż ostrzeżenie o opuszczeniu strony
+        }
+    });
 });
-
-
-

@@ -10,6 +10,25 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 </head>
 <body>
+    <!-- Informacje o użytkowniku -->
+    {% if user %}
+    <div class="user-info">
+        <span class="username">Witaj, {{ user.username }}!</span>
+        <a href="{{ url_for('logout') }}" class="logout-btn">Wyloguj</a>
+    </div>
+    {% endif %}
+    
+    <!-- Flash messages -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            <div class="flash-messages">
+                {% for category, message in messages %}
+                    <div class="flash-message {{ category }}">{{ message }}</div>
+                {% endfor %}
+            </div>
+        {% endif %}
+    {% endwith %}
+    
     <h1>Sudoku</h1>
     <div id="game-info"></div>
 

@@ -266,9 +266,7 @@ button:hover {
     animation: rocketFloat 3s ease-in-out infinite;
 }
 
-.bg-trawa {
-    z-index: 10 !important;
-}
+
 
 @keyframes lakeRipple {
     0%, 100% { transform: scale(1); }
@@ -286,7 +284,7 @@ button:hover {
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    z-index: 10;
+    z-index: 100;
     background: #f9ddd8;
     backdrop-filter: blur(3px);
     border-radius: 15px;
@@ -396,4 +394,88 @@ button:hover {
 
 .profile-btn {
     margin-right: 15px;
+}
+
+
+
+
+/* KOLEJNOSC ELEMENTOW SVG */
+.bg-sky {
+    /* Niebo - tło */
+    z-index: 0;
+}
+
+.bg-trawa {
+    /* Trawa */
+    z-index: 6;
+}
+
+.bg-slonce {
+    /* Słońce */
+    z-index: 2;
+}
+
+.bg-chmura-lewa {
+    /* Chmura lewa */
+    z-index: 10;
+}
+
+.bg-chmura-prawa {
+    /* Chmura prawa */
+    z-index: 9;
+}
+
+.bg-chmura-srodkowa {
+    /* Chmura środkowa */
+    z-index: 7;
+}
+
+.bg-gora-lewa {
+    /* Góra lewa */
+    z-index: 5;
+}
+
+.bg-gora-srodkowa {
+    /* Góra środkowa */
+    z-index: 4;
+}
+
+.bg-pagorek-ciemny {
+    /* Pagorek ciemny */
+    z-index: 3;
+}
+
+.bg-las1 {
+    /* Las 1 */
+    z-index: 9;
+}
+
+.bg-las2 {
+    /* Las 2 */
+    z-index: 8;
+}
+
+.bg-las3 {
+    /* Las 3 */
+    z-index: 7;
+}
+
+.bg-jezioro {
+    /* Jezioro */
+    z-index: 10;
+}
+
+.bg-pomost {
+    /* Pomost */
+    z-index: 11;
+}
+
+.bg-lodka {
+    /* Łódka */
+    z-index: 11;
+}
+
+.bg-rakieta {
+    /* Rakieta */
+    z-index: 5;
 }

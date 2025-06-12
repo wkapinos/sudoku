@@ -265,6 +265,10 @@ button:hover {
     animation: rocketFloat 3s ease-in-out infinite;
 }
 
+.bg-trawa {
+    z-index: 10 !important;
+}
+
 @keyframes lakeRipple {
     0%, 100% { transform: scale(1); }
     50% { transform: scale(1.02); }

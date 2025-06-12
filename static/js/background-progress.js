@@ -1,42 +1,59 @@
-// background-progress.js - CZYSTA WERSJA
+// background-progress.js - WERSJA BEZ LOCALSTORAGE
 
 class BackgroundProgress {
     constructor() {
-        this.currentLevel = 1;
-        this.maxLevel = 15; // 15 elementów tła
+        console.log("BackgroundProgress constructor wywołany!");
+        this.currentLevel = 1; // Zawsze zaczyna od 1
+        this.maxLevel = 15;
         this.init();
     }
 
     init() {
-        this.loadProgress();
+        // Usuń loadProgress() - nie używamy localStorage
         this.updateBackground();
     }
 
-    loadProgress() {
-        const saved = localStorage.getItem('backgroundLevel');
-        this.currentLevel = saved ? parseInt(saved) : 1;
-    }
+    // Usuń loadProgress() i saveProgress()
 
-    saveProgress() {
-        localStorage.setItem('backgroundLevel', this.currentLevel.toString());
-    }
-
-    unlockNextLevel() {
-        if (this.currentLevel < this.maxLevel) {
-            this.currentLevel++;
-            this.saveProgress();
+    async onSudokuComplete() {
+    console.log("onSudokuComplete wywołane!");
+    
+    try {
+        const response = await fetch('/api/user_stats');
+        const stats = await response.json();
+        
+        console.log("Otrzymane statystyki:", stats); // DEBUG
+        
+        // ZMIANA - używaj completed_games zamiast game_stats
+        const totalCompleted = stats.completed_games || 0;
+        
+        console.log(`Ukończone gry: ${totalCompleted}, obecny poziom: ${this.currentLevel}`);
+        
+        const newLevel = Math.min(totalCompleted, this.maxLevel);
+        
+        if (newLevel > this.currentLevel) {
+            console.log(`Odblokowuję poziom ${newLevel}!`);
+            this.currentLevel = newLevel;
             this.updateBackground();
         }
+        
+    } catch (error) {
+        console.error('Błąd podczas pobierania statystyk:', error);
     }
+}
 
     updateBackground() {
+        console.log(`Aktualizuję tło do poziomu ${this.currentLevel}`);
+        
         // Pokaż wszystkie elementy do aktualnego poziomu
         for (let i = 1; i <= this.maxLevel; i++) {
             const element = document.querySelector(`[data-unlock="${i}"]`);
+            console.log(`Element ${i}:`, element);
+            
             if (element) {
                 if (i <= this.currentLevel) {
+                    console.log(`Pokazuję element poziom ${i}`);
                     element.classList.add('show');
-                    // Animacja tylko dla najnowszego elementu
                     if (i === this.currentLevel) {
                         element.classList.add('just-unlocked');
                         setTimeout(() => {
@@ -51,8 +68,10 @@ class BackgroundProgress {
     }
 }
 
-// Inicjalizacja
+console.log("Tworzę backgroundProgress...");
 const backgroundProgress = new BackgroundProgress();
 
-// Export dla sudoku.js
+console.log("Ustawiam window.backgroundProgress...");
 window.backgroundProgress = backgroundProgress;
+
+console.log("Gotowe!");

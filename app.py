@@ -422,6 +422,7 @@ def get_user_stats():
         'best_times': best_times
     })
 
+
 @app.route('/profile')
 @login_required
 def profile():
@@ -510,6 +511,9 @@ def get_user_progress():
     return jsonify({
         'completed_sudokus': total_completed
     })
+
+
+
 
 @app.route('/api/sudoku_complete', methods=['POST'])
 @login_required

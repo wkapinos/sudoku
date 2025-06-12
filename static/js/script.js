@@ -21,8 +21,8 @@ document.addEventListener('DOMContentLoaded', () => {
     // Definicje poziomów trudności
     const DIFFICULTY_LEVELS = {
         '9': {
-            'easy': 0.55,      // 55% zakryte
-            'medium': 0.60,    // 60% zakryte
+            'easy': 0.10,      // 55% zakryte
+            'medium': 0.20,    // 60% zakryte
             'hard': 0.70       // 70% zakryte
         },
         '16': {
@@ -233,7 +233,7 @@ document.addEventListener('DOMContentLoaded', () => {
     function addPauseButton() {
     let pauseBtn = document.getElementById('pause-btn');
     if (!pauseBtn) {
-        Btn = document.createElement('button');
+        pauseBtn = document.createElement('button');
         pauseBtn.id = 'pause-btn';
         pauseBtn.textContent = '⏸';
         document.body.appendChild(pauseBtn);

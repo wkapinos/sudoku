@@ -15,6 +15,12 @@ h1 {
     font-size: 3rem;
 }
 
+.game-container {
+    display: flex;
+    align-self: center;
+    justify-self: center;
+}
+
 .current-game-info {
     text-align: center;
     margin-bottom: 15px;
@@ -271,16 +277,102 @@ button:hover {
 
 /* OVERLAYE DLA GŁÓWNEJ ZAWARTOŚCI - BEZ ZMIAN */
 .main-content {
-    position: relative;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
     z-index: 10;
-    background: rgba(255, 244, 242, 0.9);
+    background: #f9ddd8;
     backdrop-filter: blur(3px);
     border-radius: 15px;
     padding: 20px;
     margin: 20px auto;
-    max-width: 1200px;
+    width: 370px;
+    height: auto;
     box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
     display: flex;
     flex-direction: column;
     align-items: center;
+}
+
+
+/* Przycisk pauzy */
+#pause-btn {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    background: #35522b;
+    color: white;
+    border: none;
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
+    font-size: 1.2rem;
+    font-family: "Dongle", "Comic Sans MS", sans-serif;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    z-index: 1001;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+}
+
+#pause-btn:hover {
+    background: #5b744b;
+    transform: translateY(-2px);
+}
+
+#pause-btn.paused {
+    background: #f3baba;
+}
+
+/* Overlay przyciemnienia */
+.pause-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.8);
+    z-index: 1000;
+    display: none;
+    justify-content: center;
+    align-items: center;
+    backdrop-filter: blur(5px);
+}
+
+.pause-overlay.show {
+    display: flex;
+}
+
+.pause-message {
+    background: #f8d0c8;
+    border: #f3baba;
+    padding: 40px;
+    border-radius: 20px;
+    text-align: center;
+    font-size: 1.8rem;
+    color: #333;
+    font-family: "Dongle", "Comic Sans MS", sans-serif;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+}
+
+ .user-menu a {
+    background-color: #bfd1b3;
+    padding: 6px 12px;
+    border-radius: 5px;
+    font-family: "Dongle","Comic Sans MS", sans-serif;
+    color: #35522b !important;
+    text-decoration: none !important;
+}
+
+.user-menu a:visited {
+    color: #35522b !important;
+}
+
+.user-menu a:hover {
+    text-decoration: none;
+    color: #799567 !important;
+}
+
+.profile-btn {
+    margin-right: 15px;
 }

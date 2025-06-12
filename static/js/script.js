@@ -128,50 +128,6 @@ document.addEventListener('DOMContentLoaded', () => {
         timerElement.textContent = `Czas: ${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
     }
 
-    function addPauseButton() {
-    let pauseBtn = document.getElementById('pause-btn');
-    if (!pauseBtn) {
-        pauseBtn = document.createElement('button');
-        pauseBtn.id = 'pause-btn';
-        pauseBtn.textContent = '⏸️ Pauza';
-        document.body.appendChild(pauseBtn);
-        
-        // Dodaj overlay
-        const overlay = document.createElement('div');
-        overlay.className = 'pause-overlay';
-        overlay.innerHTML = '<div class="pause-message">Gra wstrzymana<br>Kliknij aby kontynuować</div>';
-        document.body.appendChild(overlay);
-        
-        let isPaused = false;
-        
-        pauseBtn.addEventListener('click', () => {
-            isPaused = !isPaused;
-            if (isPaused) {
-                pauseBtn.textContent = '▶️ Wznów';
-                pauseBtn.classList.add('paused');
-                overlay.classList.add('show');
-                stopTimer();
-            } else {
-                pauseBtn.textContent = '⏸️ Pauza';
-                pauseBtn.classList.remove('paused');
-                overlay.classList.remove('show');
-                startTimer();
-            }
-        });
-        
-        // Kliknięcie w overlay też wznawia grę
-        overlay.addEventListener('click', () => {
-            if (isPaused) {
-                isPaused = false;
-                pauseBtn.textContent = '⏸️ Pauza';
-                pauseBtn.classList.remove('paused');
-                overlay.classList.remove('show');
-                startTimer();
-            }
-        });
-    }
-    pauseBtn.style.display = gameActive ? 'block' : 'none';
-}
     
     function showCompletionMessage(timeSeconds) {
         const minutes = Math.floor(timeSeconds / 60);
@@ -273,6 +229,51 @@ document.addEventListener('DOMContentLoaded', () => {
         return true;
     }
 
+
+    function addPauseButton() {
+    let pauseBtn = document.getElementById('pause-btn');
+    if (!pauseBtn) {
+        Btn = document.createElement('button');
+        pauseBtn.id = 'pause-btn';
+        pauseBtn.textContent = '⏸';
+        document.body.appendChild(pauseBtn);
+        
+        const overlay = document.createElement('div');
+        overlay.className = 'pause-overlay';
+        overlay.innerHTML = '<div class="pause-message">Gra wstrzymana<br><br>Kliknij aby kontynuować</div>';
+        document.body.appendChild(overlay);
+        
+        let isPaused = false;
+        
+        pauseBtn.addEventListener('click', () => {
+            isPaused = !isPaused;
+            if (isPaused) {
+                pauseBtn.textContent = '▶';
+                pauseBtn.classList.add('paused');
+                overlay.classList.add('show');
+                stopTimer();
+            } else {
+                pauseBtn.textContent = '⏸';
+                pauseBtn.classList.remove('paused');
+                overlay.classList.remove('show');
+                startTimer();
+            }
+        });
+        
+        overlay.addEventListener('click', () => {
+            if (isPaused) {
+                isPaused = false;
+                pauseBtn.textContent = '⏸';
+                pauseBtn.classList.remove('paused');
+                overlay.classList.remove('show');
+                startTimer();
+            }
+        });
+    }
+    pauseBtn.style.display = gameActive ? 'block' : 'none';
+}
+
+
     // === DODAJ PRZYCISK PODDANIA SIĘ ===
     function addGiveUpButton() {
         let giveUpBtn = document.getElementById('give-up-btn');
@@ -280,7 +281,7 @@ document.addEventListener('DOMContentLoaded', () => {
             giveUpBtn = document.createElement('button');
             giveUpBtn.id = 'give-up-btn';
             giveUpBtn.textContent = 'Poddaj się';
-            giveUpBtn.style.cssText = 'margin-left: 10px; background: #35522b; color: white; padding: 0px 15px; border: none; border-radius: 5px; cursor: pointer;';
+            giveUpBtn.style.cssText = 'margin-left: 10px; background: #35522b; color: white; padding: 0px 15px; border: none; border-radius: 10px; cursor: pointer;';
             newGameBtn.parentNode.insertBefore(giveUpBtn, newGameBtn.nextSibling);
             
             giveUpBtn.addEventListener('click', () => {
@@ -292,6 +293,8 @@ document.addEventListener('DOMContentLoaded', () => {
         giveUpBtn.style.display = gameActive ? 'inline-block' : 'none';
         addPauseButton();
     }
+
+    
 
     // === EXISTING CODE Z MODYFIKACJAMI ===
 

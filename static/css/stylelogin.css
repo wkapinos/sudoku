@@ -1,0 +1,126 @@
+* {
+    font-size: 20px;
+}
+
+body {
+    font-family: "Dongle","Comic Sans MS", sans-serif;
+    min-height: 100vh;
+    background: linear-gradient(11.21deg, #B8DDE3 -0.76%, #A7F1FF 16.78%, #5386AC 113.02%);
+    margin: 0;
+}
+
+h1 {
+    color: #555;
+    margin-bottom: 1rem;
+    font-size: 3rem;
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+.auth-container {
+    max-width: 400px;
+    margin: 50px auto;
+    padding: 30px;
+    background: #f9ddd8;
+    border-radius: 15px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+    border: 1px solid #f3baba;
+}
+
+.auth-form {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+}
+
+.form-group label {
+    margin-bottom: 5px;
+    font-weight: bold;
+    color: #555;
+    font-size: 1.2rem;
+}
+
+.form-group input {
+    padding: 12px;
+    border: 2px solid #f3baba;
+    border-radius: 8px;
+    font-size: 1.2rem;
+    font-family: "Dongle","Comic Sans MS", sans-serif;
+    transition: border-color 0.3s;
+    background-color: #f8d0c8;
+}
+
+.form-group input:focus {
+    outline: none;
+    border-color: #5b744b;
+    background-color: #f9ddd8;
+}
+
+.btn-primary {
+    font-family: "Dongle","Comic Sans MS", sans-serif;
+    background: #5b744b;
+    color: #fff4f2;
+    padding: 12px 20px;
+    border: none;
+    border-radius: 8px;
+    font-size: 1.8rem;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.btn-primary:hover {
+    background-color: #35522b;
+}
+
+.auth-links {
+    text-align: center;
+    margin-top: 20px;
+}
+
+.auth-links p {
+    color: #555;
+    font-size: 1.2rem;
+}
+
+.auth-links a {
+    color: #5b744b;
+    text-decoration: none;
+}
+
+.auth-links a:hover {
+    text-decoration: underline;
+}
+
+.flash-messages {
+    margin-bottom: 20px;
+}
+
+.flash-message {
+    padding: 10px;
+    margin-bottom: 10px;
+    border-radius: 5px;
+    font-size: 1.1rem;
+}
+
+.flash-message.error {
+    background: #f8d7da;
+    color: #721c24;
+    border: 1px solid #f5c6cb;
+}
+
+.flash-message.success {
+    background: #d4edda;
+    color: #155724;
+    border: 1px solid #c3e6cb;
+}
+
+.flash-message.info {
+    background: #d1ecf1;
+    color: #0c5460;
+    border: 1px solid #bee5eb;
+}

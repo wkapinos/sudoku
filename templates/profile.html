@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Profil - {{ user.username }}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Profil użytkownika</h1>
+            <nav>
+                <a href="{{ url_for('index') }}">← Powrót do gry</a>
+                <a href="{{ url_for('logout') }}">Wyloguj</a>
+            </nav>
+        </header>
+        <div class="profile-info">
+            <h2>{{ user.username }}</h2>
+            <p>Email: {{ user.email }}</p>
+            <p>Zarejestrowany: {{ user.created_at.strftime('%d.%m.%Y') }}</p>
+        </div>
+        <div class="stats-grid">
+            <div class="stat-card">
+                <h3>Ogólne statystyki</h3>
+                <p><strong>Wszystkie gry:</strong> {{ total_games }}</p>
+               
+                <h4>Ukończone gry:</h4>
+                {% if game_stats %}
+                    {% for category, stats in game_stats.items() %}
+                        {% if stats.completed > 0 %}
+                            <p><strong>{{ category }}:</strong> {{ stats.completed }}</p>
+                        {% endif %}
+                    {% endfor %}
+                {% else %}
+                    <p>Brak ukończonych gier</p>
+                {% endif %}
+               
+                <h4>Porzucone gry:</h4>
+                {% if game_stats %}
+                    {% for category, stats in game_stats.items() %}
+                        {% if stats.abandoned > 0 %}
+                            <p><strong>{{ category }}:</strong> {{ stats.abandoned }}</p>
+                        {% endif %}
+                    {% endfor %}
+                {% else %}
+                    <p>Brak porzuconych gier</p>
+                {% endif %}
+               
+                <h4>Procent ukończonych:</h4>
+                {% if game_stats %}
+                    {% for category, stats in game_stats.items() %}
+                        <p><strong>{{ category }}:</strong> {{ stats.completion_rate }}%</p>
+                    {% endfor %}
+                {% endif %}
+            </div>
+            <div class="stat-card">
+                <h3>Najlepsze czasy</h3>
+                {% if best_scores %}
+                    {% for score in best_scores %}
+                        <p><strong>{{ score.board_size }}x{{ score.board_size }} ({{ score.difficulty }}):</strong>
+                           {{ score.best_time_seconds // 60 }}:{{ '%02d'|format(score.best_time_seconds % 60) }}</p>
+                    {% endfor %}
+                {% else %}
+                    <p>Brak ukończonych gier</p>
+                {% endif %}
+               
+                <h4>Średnie czasy:</h4>
+                {% if game_stats %}
+                    {% for category, stats in game_stats.items() %}
+                        {% if stats.completed > 0 %}
+                            <p><strong>{{ category }}:</strong> {{ stats.avg_time_minutes }}:{{ '%02d'|format(stats.avg_time_seconds % 60) }}</p>
+                        {% endif %}
+                    {% endfor %}
+                {% endif %}
+            </div>
+        </div>
+        <!-- Recent games section -->
+        {% if recent_games %}
+        <div class="stat-card">
+            <h3>Ostatnie gry</h3>
+            {% for game in recent_games %}
+                <p><strong>{{ game.board_size }}x{{ game.board_size }} ({{ game.difficulty }}):</strong>
+                   {{ game.status }} - {{ game.started_at.strftime('%d.%m.%Y %H:%M') }}</p>
+            {% endfor %}
+        </div>
+        {% endif %}
+    </div>
+</body>
+</html>
+
+index.html:

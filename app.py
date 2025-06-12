@@ -39,6 +39,7 @@ class User(db.Model):
     
     def __repr__(self):
         return f'<User {self.username}>'
+    
 
 class SudokuGame(db.Model):
     __tablename__ = 'sudoku_games'
@@ -71,6 +72,14 @@ class SudokuBestScore(db.Model):
     game = db.relationship('SudokuGame')
     
     __table_args__ = (db.UniqueConstraint('user_id', 'board_size', 'difficulty'),)
+
+# class UserUnlock(db.Model):
+#     id = db.Column(db.Integer, primary_key=True)
+#     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+#     unlock_type = db.Column(db.String(50), nullable=False)  # np. "tree", "flower", "castle"
+#     unlocked_at = db.Column(db.DateTime, default=datetime.utcnow)
+    
+#     user = db.relationship('User', backref=db.backref('unlocks', lazy=True))
 
 # === FUNKCJE POMOCNICZE ===
 
@@ -413,6 +422,122 @@ def get_user_stats():
         'best_times': best_times
     })
 
+@app.route('/profile')
+@login_required
+def profile():
+    """Strona profilu użytkownika ze statystykami"""
+    user_id = session['user_id']
+    user = User.query.get(user_id)
+    
+    # Ogólne statystyki
+    total_games = SudokuGame.query.filter_by(user_id=user_id).count()
+    
+    # Statystyki per kategoria
+    game_stats = {}
+    
+    distinct_games = db.session.query(
+        SudokuGame.board_size, 
+        SudokuGame.difficulty
+    ).filter_by(user_id=user_id).distinct().all()
+    
+    for board_size, difficulty in distinct_games:
+        category = f"{board_size}x{board_size} ({difficulty})"
+        
+        category_games = SudokuGame.query.filter_by(
+            user_id=user_id, 
+            board_size=board_size, 
+            difficulty=difficulty
+        )
+        
+        total_in_category = category_games.count()
+        completed_in_category = category_games.filter_by(status='completed').count()
+        abandoned_in_category = category_games.filter_by(status='abandoned').count()
+        
+        # Średni czas ukończonych gier
+        completed_games_with_time = category_games.filter(
+            SudokuGame.status == 'completed',
+            SudokuGame.time_seconds.isnot(None)
+        ).all()
+        
+        avg_time_seconds = 0
+        if completed_games_with_time:
+            total_time = sum(game.time_seconds for game in completed_games_with_time)
+            avg_time_seconds = total_time // len(completed_games_with_time)
+        
+        completion_rate = round(completed_in_category / total_in_category * 100, 1) if total_in_category > 0 else 0
+        
+        game_stats[category] = {
+            'total': total_in_category,
+            'completed': completed_in_category,
+            'abandoned': abandoned_in_category,
+            'completion_rate': completion_rate,
+            'avg_time_minutes': avg_time_seconds // 60,
+            'avg_time_seconds': avg_time_seconds % 60
+        }
+    
+    best_scores = SudokuBestScore.query.filter_by(user_id=user_id).all()
+    recent_games = SudokuGame.query.filter_by(user_id=user_id).order_by(SudokuGame.started_at.desc()).limit(5).all()
+    
+    return render_template('profile.html', 
+                         user=user,
+                         total_games=total_games,
+                         game_stats=game_stats,
+                         best_scores=best_scores,
+                         recent_games=recent_games)
+
+@app.route('/api/user_progress')
+@login_required  
+def get_user_progress():
+    """Zwraca postęp użytkownika dla systemu tła"""
+    user_id = session['user_id']
+    
+    # Skopiowana logika z /profile - liczy wszystkie ukończone gry
+    distinct_games = db.session.query(
+        SudokuGame.board_size, 
+        SudokuGame.difficulty
+    ).filter_by(user_id=user_id).distinct().all()
+    
+    total_completed = 0
+    for board_size, difficulty in distinct_games:
+        category_games = SudokuGame.query.filter_by(
+            user_id=user_id, 
+            board_size=board_size, 
+            difficulty=difficulty
+        )
+        completed_in_category = category_games.filter_by(status='completed').count()
+        total_completed += completed_in_category
+    
+    return jsonify({
+        'completed_sudokus': total_completed
+    })
+
+@app.route('/api/sudoku_complete', methods=['POST'])
+@login_required
+def sudoku_complete():
+    """Wywoływane po ukończeniu sudoku - zwraca nowy postęp"""
+    user_id = session['user_id']
+    
+    # Policz ponownie wszystkie ukończone gry (fresh data)
+    distinct_games = db.session.query(
+        SudokuGame.board_size, 
+        SudokuGame.difficulty
+    ).filter_by(user_id=user_id).distinct().all()
+    
+    total_completed = 0
+    for board_size, difficulty in distinct_games:
+        category_games = SudokuGame.query.filter_by(
+            user_id=user_id, 
+            board_size=board_size, 
+            difficulty=difficulty
+        )
+        completed_in_category = category_games.filter_by(status='completed').count()
+        total_completed += completed_in_category
+    
+    return jsonify({
+        'success': True,
+        'completed_sudokus': total_completed,
+        'new_unlock_level': total_completed  # jaki element został właśnie odblokowany
+    })
 
 if __name__ == '__main__':
     init_db()  # Utwórz tabele jeśli nie istnieją

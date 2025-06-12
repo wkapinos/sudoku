@@ -86,6 +86,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 
                 if (status === 'completed') {
                     showCompletionMessage(timeSeconds);
+    
+                    if (window.backgroundProgress) {
+                        await window.backgroundProgress.onSudokuComplete();
+                    }
                 }
             }
         } catch (error) {
@@ -117,12 +121,57 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!timerElement) {
             timerElement = document.createElement('div');
             timerElement.id = 'game-timer';
-            timerElement.style.cssText = 'position: absolute; top: 20px; left: 20px; background: rgba(255,255,255,0.9); padding: 10px; border-radius: 5px; font-weight: bold;';
+            timerElement.style.cssText = 'position: absolute; top: 20px; left: 20px; background: rgba(255, 255, 255, 0); padding: 10px; border-radius: 5px; font-weight: bold;';
             document.body.appendChild(timerElement);
         }
         
         timerElement.textContent = `Czas: ${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
     }
+
+    function addPauseButton() {
+    let pauseBtn = document.getElementById('pause-btn');
+    if (!pauseBtn) {
+        pauseBtn = document.createElement('button');
+        pauseBtn.id = 'pause-btn';
+        pauseBtn.textContent = '⏸️ Pauza';
+        document.body.appendChild(pauseBtn);
+        
+        // Dodaj overlay
+        const overlay = document.createElement('div');
+        overlay.className = 'pause-overlay';
+        overlay.innerHTML = '<div class="pause-message">Gra wstrzymana<br>Kliknij aby kontynuować</div>';
+        document.body.appendChild(overlay);
+        
+        let isPaused = false;
+        
+        pauseBtn.addEventListener('click', () => {
+            isPaused = !isPaused;
+            if (isPaused) {
+                pauseBtn.textContent = '▶️ Wznów';
+                pauseBtn.classList.add('paused');
+                overlay.classList.add('show');
+                stopTimer();
+            } else {
+                pauseBtn.textContent = '⏸️ Pauza';
+                pauseBtn.classList.remove('paused');
+                overlay.classList.remove('show');
+                startTimer();
+            }
+        });
+        
+        // Kliknięcie w overlay też wznawia grę
+        overlay.addEventListener('click', () => {
+            if (isPaused) {
+                isPaused = false;
+                pauseBtn.textContent = '⏸️ Pauza';
+                pauseBtn.classList.remove('paused');
+                overlay.classList.remove('show');
+                startTimer();
+            }
+        });
+    }
+    pauseBtn.style.display = gameActive ? 'block' : 'none';
+}
     
     function showCompletionMessage(timeSeconds) {
         const minutes = Math.floor(timeSeconds / 60);
@@ -231,7 +280,7 @@ document.addEventListener('DOMContentLoaded', () => {
             giveUpBtn = document.createElement('button');
             giveUpBtn.id = 'give-up-btn';
             giveUpBtn.textContent = 'Poddaj się';
-            giveUpBtn.style.cssText = 'margin-left: 10px; background: #dc3545; color: white; padding: 10px 15px; border: none; border-radius: 5px; cursor: pointer;';
+            giveUpBtn.style.cssText = 'margin-left: 10px; background: #35522b; color: white; padding: 0px 15px; border: none; border-radius: 5px; cursor: pointer;';
             newGameBtn.parentNode.insertBefore(giveUpBtn, newGameBtn.nextSibling);
             
             giveUpBtn.addEventListener('click', () => {
@@ -241,6 +290,7 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         }
         giveUpBtn.style.display = gameActive ? 'inline-block' : 'none';
+        addPauseButton();
     }
 
     // === EXISTING CODE Z MODYFIKACJAMI ===

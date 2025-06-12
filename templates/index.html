@@ -10,73 +10,158 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 </head>
 <body>
-    <!-- Informacje o użytkowniku -->
-    {% if user %}
-    <div class="user-info">
-        <span class="username">Witaj, {{ user.username }}!</span>
-        <a href="{{ url_for('logout') }}" class="logout-btn">Wyloguj</a>
-    </div>
-    {% endif %}
-    
-    <!-- Flash messages -->
-    {% with messages = get_flashed_messages(with_categories=true) %}
-        {% if messages %}
-            <div class="flash-messages">
-                {% for category, message in messages %}
-                    <div class="flash-message {{ category }}">{{ message }}</div>
-                {% endfor %}
-            </div>
-        {% endif %}
-    {% endwith %}
-    
-    <h1>Sudoku</h1>
-    <div id="game-info"></div>
+    <!-- PROGRESYWNE TŁO Z PRAWDZIWYMI SVG Z FIGMY -->
+    <div class="background-layer">
+        <!-- NIEBO - zawsze widoczne -->
+        <div class="bg-sky"></div>
+        
+        <!-- 1. TRAWA (poziom 1) -->
+        <svg class="bg-element bg-trawa" data-unlock="1" viewBox="0 0 1920 301" style="position: absolute; bottom: -7.52%; left: -5.87%; width: 116.66%; height: auto;">
+            <path d="M-104.545 196.918C-59.5331 35.432 388.011 0.869995 985.66 0.869995C1583.31 0.869995 2092.22 43.4259 2098.69 267.69C2105.16 491.96 2007.34 316.26 985.66 323.84C-36.0165 331.43 -149.556 358.4 -104.545 196.918Z" fill="#679E60"/>
+        </svg>
 
-    <div id="sudoku-board" class="sudoku-board">
-    </div>
-    <button id="new-game-btn">nowa gra</button>
+        <!-- 2. SŁOŃCE (poziom 2) -->
+        <svg class="bg-element bg-slonce" data-unlock="2" viewBox="0 0 211 211" style="position: absolute; top: 7.34%; left: 30.61%; width: 11%; height: auto;">
+            <path d="M0.646973 105.225C0.646973 47.235 47.657 0.225281 105.647 0.225281C163.637 0.225281 210.647 47.235 210.647 105.225C210.647 163.215 163.637 210.225 105.647 210.225C47.657 210.225 0.646973 163.215 0.646973 105.225Z" fill="#FFC81E"/>
+        </svg>
 
-    <!-- Modal z opcjami trudności -->
-    <div id="difficulty-modal" class="modal">
-        <div class="modal-content">
-            <h2>wybierz poziom trudności</h2>
+        <!-- 3. GÓRA LEWA (poziom 3) -->
+        <svg class="bg-element bg-gora-lewa" data-unlock="3" viewBox="0 0 923 719" style="position: absolute; top: 20.35%; left: -5.87%; width: 48%; height: auto;">
+            <path d="M-112.649 654.116C-112.649 517.466 64.0237 0.747009 287.733 0.747009C511.442 0.747009 844.228 429.06 898.019 554.678C912.602 588.735 926.224 610.765 921.914 619.948C873.794 722.463 542.186 668.739 336.867 668.739C113.158 668.739 -112.649 790.77 -112.649 654.116Z" fill="url(#paint0_linear_gora_lewa)"/>
+            <defs>
+                <linearGradient id="paint0_linear_gora_lewa" x1="346.107" y1="-29.826" x2="675.327" y2="934.436" gradientUnits="userSpaceOnUse">
+                    <stop stop-color="#83B971"/>
+                    <stop offset="1" stop-color="#457235"/>
+                </linearGradient>
+            </defs>
+        </svg>
+
+        <!-- 4. GÓRA ŚRODKOWA (poziom 4) -->
+        <svg class="bg-element bg-gora-srodkowa" data-unlock="4" viewBox="0 0 926 597" style="position: absolute; top: 32.55%; left: 29.11%; width: 48%; height: auto;">
+            <path d="M64.7 362.981C244.405 142.155 398.277 0.569 545.27 0.569C692.26 0.569 665.08 169.383 866.57 382.041C902.28 419.733 934.21 472.602 924.1 498.117C877.17 616.555 394.614 594.699 273.675 594.699C126.683 594.699 -115.004 583.808 64.7 362.981Z" fill="url(#paint0_linear_gora_srodkowa)"/>
+            <defs>
+                <linearGradient id="paint0_linear_gora_srodkowa" x1="484.05" y1="-89.551" x2="630.289" y2="1105.29" gradientUnits="userSpaceOnUse">
+                    <stop offset="0.404167" stop-color="#457235"/>
+                    <stop offset="1" stop-color="#3B5A31"/>
+                </linearGradient>
+            </defs>
+        </svg>
+
+        <!-- 5. PAGÓREK CIEMNY (poziom 5) -->
+        <svg class="bg-element bg-pagorek-ciemny" data-unlock="5" viewBox="0 0 613 289" style="position: absolute; top: 57.34%; left: 68.09%; width: 32%; height: auto;">
+            <path d="M38.91 134.522C174.19 35.984 208.7 0.224976 352.27 0.224976C495.84 0.224976 820.24 93.217 820.24 193.579C820.24 293.941 526.63 288.636 339.85 288.636C153.06 288.636 -96.37 233.061 38.91 134.522Z" fill="#3B5A31"/>
+        </svg>
+
+        <!-- 6. CHMURA LEWA (poziom 6) -->
+        <svg class="bg-element bg-chmura-lewa" data-unlock="6" viewBox="0 0 502 179" style="position: absolute; top: 16.76%; left: 9.08%; width: 26%; height: auto;">
+            <path d="M34.146 134.293C34.146 121.626 -4.61101 101.097 0.787994 75.547C12.652 19.414 128.468 -2.46704 207.835 0.220956C282.949 2.76496 271.381 32.901 321.51 32.199C374.891 31.452 489.159 42.563 500.397 75.547C510.877 106.306 465.789 121.403 466.811 145.818C468.363 182.93 352.322 178.203 231.812 178.203C111.303 178.203 34.146 171.437 34.146 134.293Z" fill="#E4EDF1"/>
+        </svg>
+
+        <!-- 7. CHMURA PRAWA (poziom 7) -->
+        <svg class="bg-element bg-chmura-prawa" data-unlock="7" viewBox="0 0 529 172" style="position: absolute; top: 20.35%; right: 2.8%; width: 27%; height: auto;">
+            <path d="M102.03 125.453C102.03 111.072 -5.11995 101.833 1.01005 72.826C14.4801 9.097 150.19 -1.84699 240.29 1.20501C325.57 4.09301 271.1 24.108 328.01 23.311C388.61 22.462 470.89 38.642 483.65 76.09C495.55 111.012 527 102.022 528.16 129.742C529.92 171.875 457.99 171.787 321.17 171.787C184.35 171.787 102.03 167.623 102.03 125.453Z" fill="#E4EDF1"/>
+        </svg>
+
+        <!-- 8. CHMURA ŚRODKOWA (poziom 8) -->
+        <svg class="bg-element bg-chmura-srodkowa" data-unlock="8" viewBox="0 0 419 173" style="position: absolute; top: 9.1%; left: 55.5%; width: 22%; height: auto;">
+            <path d="M0.569987 98.593C0.229987 58.726 11.4401 47.737 40.1801 31.265C73.4001 12.229 121.65 0.250732 175.36 0.250732C253.7 0.250732 243.96 20.288 285.75 21.99C359.42 24.99 419 58.157 419 89.597C419 141.012 384.26 172.594 284.08 172.196C216.46 171.928 236.89 149.096 199.42 149.096C196.64 149.096 119.14 155.84 82.6701 149.096C25.8601 138.588 0.909987 138.461 0.569987 98.593Z" fill="#DAE6ED"/>
+        </svg>
+
+        <!-- 9. LAS1 (poziom 9) -->
+        <svg class="bg-element bg-las1" data-unlock="9" viewBox="0 0 344 191" style="position: absolute; top: 66.46%; left: -1.05%; width: 18%; height: auto;">
+            <path d="M232.131 73.042H240.48H248.829C248.829 73.042 245.3 91.646 245.3 109.187C245.3 126.727 248.829 143.203 248.829 143.203C248.829 143.203 247.616 146.225 241.045 146.247C234.474 146.269 232.324 143.203 232.324 143.203C232.324 143.203 235.333 126.019 235.333 108.478C235.333 90.938 232.131 73.042 232.131 73.042Z" fill="#4D3625"/>
+            <path d="M232.131 55.368C232.131 55.368 250.177 69.011 263.72 84.885C277.262 100.758 286.299 118.862 286.299 118.862C286.299 118.862 263.339 124.16 240.48 123.999C217.621 123.838 194.863 118.217 194.863 118.217C194.863 118.217 199.644 99.709 208.961 83.997C218.278 68.285 232.131 55.368 232.131 55.368Z" fill="#3B662B"/>
+            <!-- Dodaj resztę path-ów dla drzew... skrócone dla czytelności -->
+        </svg>
+
+        <!-- 10. LAS2 (poziom 10) -->
+        <svg class="bg-element bg-las2" data-unlock="10" viewBox="0 0 365 191" style="position: absolute; top: 64.7%; left: 14.46%; width: 19%; height: auto;">
+            <!-- Wstaw kod SVG dla las2 -->
+        </svg>
+
+        <!-- 11. LAS3 (poziom 11) -->
+        <svg class="bg-element bg-las3" data-unlock="11" viewBox="0 0 448 191" style="position: absolute; top: 63.42%; left: 30.61%; width: 23%; height: auto;">
+            <!-- Wstaw kod SVG dla las3 -->
+        </svg>
+
+        <!-- 12. JEZIORO (poziom 12) -->
+        <svg class="bg-element bg-jezioro" data-unlock="12" viewBox="0 0 708 161" style="position: absolute; top: 78.54%; left: 60.28%; width: 37%; height: auto;">
+            <path d="M0.439936 89.449C-4.09006 14.891 142.42 0.226013 324.84 0.226013C507.26 0.226013 707.03 28.519 707.03 102.065C707.03 175.61 507.26 159.02 324.84 159.02C142.42 159.02 4.96994 164.01 0.439936 89.449Z" fill="#71ABB9"/>
+        </svg>
+
+        <!-- 13. POMOST (poziom 13) -->
+        <svg class="bg-element bg-pomost" data-unlock="13" viewBox="0 0 211 47" style="position: absolute; top: 84.04%; left: 58.79%; width: 11%; height: auto;">
+            <!-- Wstaw kod SVG dla pomost -->
+        </svg>
+
+        <!-- 14. ŁÓDKA (poziom 14) -->
+        <svg class="bg-element bg-lodka" data-unlock="14" viewBox="0 0 169 70" style="position: absolute; top: 80.46%; left: 71.5%; width: 8.8%; height: auto;">
+            <!-- Wstaw kod SVG dla łódka -->
+        </svg>
+
+        <!-- 15. RAKIETA (poziom 15) -->
+        <svg class="bg-element bg-rakieta" data-unlock="15" viewBox="0 0 115 230" style="position: absolute; top: 43.47%; left: 84.72%; width: 6%; height: auto;">
+            <!-- Wstaw kod SVG dla rakieta -->
+        </svg>
+    </div>
+
+    <!-- GŁÓWNA ZAWARTOŚĆ -->
+    <div class="game-container">
+        <div class="main-content">
+            <!-- Flash messages -->
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    <div class="flash-messages">
+                        {% for category, message in messages %}
+                            <div class="flash-message {{ category }}">{{ message }}</div>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+            {% endwith %}
+
+            <h1>Sudoku</h1>
             
-            <div class="difficulty-options">
-                <div class="difficulty-section">
-                    <h3>plansza mała</h3>
-                    <div class="difficulty-buttons">
-                        <button class="difficulty-btn" data-size="9" data-difficulty="easy">
-                            łatwa
-                        </button>
-                        <button class="difficulty-btn" data-size="9" data-difficulty="medium">
-                            średnia
-                        </button>
-                        <button class="difficulty-btn" data-size="9" data-difficulty="hard">
-                            trudna
-                        </button>
+            <div class="user-menu">
+                <a href="{{ url_for('profile') }}" class="profile-btn">👤 {{ user.username }}</a>
+                <a href="{{ url_for('logout') }}" class="logout-btn">Wyloguj</a>
+            </div>
+
+            <div id="game-info"></div>
+            <div id="sudoku-board" class="sudoku-board"></div>
+            <button id="new-game-btn">nowa gra</button>
+
+            <!-- Modal z opcjami trudności -->
+            <div id="difficulty-modal" class="modal">
+                <div class="modal-content">
+                    <h2>wybierz poziom trudności</h2>
+                    
+                    <div class="difficulty-options">
+                        <div class="difficulty-section">
+                            <h3>plansza mała</h3>
+                            <div class="difficulty-buttons">
+                                <button class="difficulty-btn" data-size="9" data-difficulty="easy">łatwa</button>
+                                <button class="difficulty-btn" data-size="9" data-difficulty="medium">średnia</button>
+                                <button class="difficulty-btn" data-size="9" data-difficulty="hard">trudna</button>
+                            </div>
+                        </div>
+                        
+                        <div class="difficulty-section">
+                            <h3>plansza duża</h3>
+                            <div class="difficulty-buttons">
+                                <button class="difficulty-btn" data-size="16" data-difficulty="easy">łatwa</button>
+                                <button class="difficulty-btn" data-size="16" data-difficulty="medium">średnia</button>
+                                <button class="difficulty-btn" data-size="16" data-difficulty="hard">trudna</button>
+                            </div>
+                        </div>
                     </div>
-                </div>
-                
-                <div class="difficulty-section">
-                    <h3>plansza duża</h3>
-                    <div class="difficulty-buttons">
-                        <button class="difficulty-btn" data-size="16" data-difficulty="easy">
-                            łatwa
-                        </button>
-                        <button class="difficulty-btn" data-size="16" data-difficulty="medium">
-                            średnia
-                        </button>
-                        <button class="difficulty-btn" data-size="16" data-difficulty="hard">
-                            trudna
-                        </button>
-                    </div>
+                    
+                    <button class="close-modal" id="close-modal">Anuluj</button>
                 </div>
             </div>
-            
-            <button class="close-modal" id="close-modal">Anuluj</button>
         </div>
     </div>
 
     <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/background-progress.js') }}"></script>
 </body>
 </html>

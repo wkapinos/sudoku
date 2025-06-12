@@ -106,9 +106,6 @@ def login_required(f):
 def czyUzytaBOX(x, plansza, rowStart, colStart, num):
     for i in range(x):
         for j in range(x):
-            # Ważne: Sprawdź, czy komórka jest faktycznie równa num, a nie tylko czy num jest w niej użyte.
-            # Poprzednia implementacja (num not in plansza[i] / [plansza[i][j] for i in range(x**2)])
-            # sprawdzała obecność num w całym wierszu/kolumnie, a tu chodzi o konkretny kwadrat
             if plansza[rowStart + i][colStart + j] == num:
                 return False # Numer jest użyty, więc nie jest odpowiedni
     return True # Numer nie jest użyty w kwadracie
@@ -127,9 +124,6 @@ def czyOdpowiednie(x, plansza, i, j, num):
     # Upewnij się, że używasz planszy do sprawdzania, a nie tylko 'x'
     return (czyUzytaROW(plansza, i, num) and
             czyUzytaCOL(x, plansza, j, num) and
-            # Zmieniono logikę, aby sprawdzić, czy numer NIE jest użyty w BOX, ROW, COL
-            # Twoje funkcje czyUzyta... zwracają False jeśli numer jest użyty, więc
-            # czyOdpowiednie powinno sprawdzać, czy SĄ PRAWDA (czyli num NIE jest użyty)
             czyUzytaBOX(x, plansza, i - i % x, j - j % x, num))
 
 
@@ -169,9 +163,6 @@ def fillPozostale(x, plansza, i, j):
     random.shuffle(numbers_to_try) # Tasowanie, aby uzyskać różne rozwiązania
 
     for num in numbers_to_try:
-        # UWAGA: Twoje funkcje czyUzyta... zwracają False, jeśli numer JEST UŻYTY.
-        # Więc tutaj, aby sprawdzić, czy JEST ODPOWIEDNIE, musimy odwrócić logikę.
-        # czyOdpowiednie zostało poprawione powyżej, więc zakładam, że zwraca True, jeśli jest OK.
         if czyOdpowiednie(x, plansza, i, j, num):
             plansza[i][j] = num
             if fillPozostale(x, plansza, i, j + 1):
@@ -190,37 +181,9 @@ def sudokuGenerator(x):
 
     return plansza
 
-# --- Tutaj kończy się Twój kod generatora Sudoku ---
+# --- Tutaj kończy się kod generatora Sudoku ---
 
 
-# @app.route('/')
-# def index():
-#     return render_template('index.html') # Renderuje plik HTML
-
-# # Nowy endpoint API do generowania planszy Sudoku
-# from flask import request  # ← dodaj TYLKO JEDEN raz na górze, jeśli jeszcze nie masz
-
-# @app.route('/api/sudoku', methods=['GET'])
-# def get_sudoku_board():
-#     size_param = request.args.get('size', '9')
-
-#     if size_param == '9':
-#         x_val = 3
-#     elif size_param == '16':
-#         x_val = 4
-#     else:
-#         return jsonify({'error': 'Nieobsługiwany rozmiar planszy'}), 400
-
-#     generated_board = sudokuGenerator(x_val)
-#     return jsonify(generated_board)
-
-
-
-
-# if __name__ == '__main__':
-#     app.run(debug=True)
-
-    # === ROUTES ===
 @app.route('/health')
 def health():
     return {'status': 'ok', 'message': 'App is running'}, 200
@@ -228,7 +191,7 @@ def health():
 
 @app.route('/')
 def index():
-    # Sprawdź czy użytkownik jest zalogowany
+    # czy użytkownik jest zalogowany
     if 'user_id' not in session:
         return redirect(url_for('login'))
     

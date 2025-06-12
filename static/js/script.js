@@ -11,7 +11,7 @@ document.addEventListener('DOMContentLoaded', () => {
     let currentDifficulty = 'medium';
     let highlightedValue = null;
     
-    // === NOWE ZMIENNE DO TRACKINGU GIER ===
+    // === ZMIENNE DO TRACKINGU GIER ===
     let currentGameId = null;
     let gameStartTime = null;
     let movesCount = 0;
@@ -21,7 +21,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // Definicje poziomów trudności
     const DIFFICULTY_LEVELS = {
         '9': {
-            'easy': 0.10,      // 55% zakryte
+            'easy': 0.10,      // 55% zakryte to zmienilam do prezentacji
             'medium': 0.20,    // 60% zakryte
             'hard': 0.70       // 70% zakryte
         },
@@ -98,7 +98,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     
     function startTimer() {
-        stopTimer(); // Zatrzymaj poprzedni timer jeśli istnieje
+        stopTimer();
         gameTimer = setInterval(updateTimerDisplay, 1000);
     }
     
@@ -116,7 +116,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const minutes = Math.floor(elapsed / 60);
         const seconds = elapsed % 60;
         
-        // Znajdź lub utwórz element timera
+    
         let timerElement = document.getElementById('game-timer');
         if (!timerElement) {
             timerElement = document.createElement('div');
@@ -134,7 +134,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const seconds = timeSeconds % 60;
         const timeStr = `${minutes}:${seconds.toString().padStart(2, '0')}`;
         
-        alert(`🎉 Gratulacje! Ukończyłeś Sudoku w czasie: ${timeStr}!`);
+        alert(`Gratulacje! Ukończyłeś Sudoku w czasie: ${timeStr}!`);
     }
     
     function checkGameCompletion() {
@@ -168,8 +168,7 @@ document.addEventListener('DOMContentLoaded', () => {
     function validateSudoku() {
         const cells = sudokuBoard.querySelectorAll('.cell');
         const board = [];
-        
-        // Przekształć komórki z powrotem na tablicę 2D
+  
         for (let i = 0; i < currentSize; i++) {
             board[i] = [];
             for (let j = 0; j < currentSize; j++) {
@@ -274,7 +273,7 @@ document.addEventListener('DOMContentLoaded', () => {
 }
 
 
-    // === DODAJ PRZYCISK PODDANIA SIĘ ===
+    // === PRZYCISK PODDANIA SIĘ ===
     function addGiveUpButton() {
         let giveUpBtn = document.getElementById('give-up-btn');
         if (!giveUpBtn) {
@@ -296,11 +295,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
     
 
-    // === EXISTING CODE Z MODYFIKACJAMI ===
 
-    // Pokaż modal po kliknięciu "Nowa Gra"
     newGameBtn.addEventListener('click', () => {
-        // Jeśli gra jest aktywna, zapytaj o poddanie się
         if (gameActive) {
             if (confirm('Rozpocząć nową grę? Obecna gra zostanie przerwana.')) {
                 finishGameTracking('abandoned');
@@ -314,19 +310,18 @@ document.addEventListener('DOMContentLoaded', () => {
         modal.style.justifyContent = 'center';
     });
 
-    // Zamknij modal
     closeModalBtn.addEventListener('click', () => {
         modal.style.display = 'none';
     });
 
-    // Zamknij modal po kliknięciu w tło
+
     modal.addEventListener('click', (e) => {
         if (e.target === modal) {
             modal.style.display = 'none';
         }
     });
 
-    // Obsługa przycisków wyboru trudności
+
     difficultyBtns.forEach(btn => {
         btn.addEventListener('click', () => {
             const size = parseInt(btn.dataset.size);
@@ -342,14 +337,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
 
 
-    
-    // --- Funkcja do pobierania planszy Sudoku z backendu ---
+
     async function fetchSudokuBoard(difficulty = 'medium', boardSize = 9) {
         try {
             document.querySelector('.main-content').style.background = 'rgba(249, 221, 216, 0.19)';
             document.querySelector('.profile-btn').style.background = 'rgba(249, 221, 216, 0)';
             document.querySelector('.logout-btn').style.background = 'rgba(249, 221, 216, 0)';
-            // Rozpocznij tracking nowej gry
             await startGameTracking(boardSize, difficulty);
             
             const response = await fetch(`/api/sudoku?size=${boardSize}`);
@@ -398,20 +391,16 @@ document.addEventListener('DOMContentLoaded', () => {
         const cells = sudokuBoard.querySelectorAll('.cell');
         
         cells.forEach(cell => {
-            // Event listener dla kliknięcia
             cell.addEventListener('click', (e) => {
                 const value = e.target.value.trim();
                 highlightSameValues(value);
             });
             
-            // Event listener dla zmiany wartości (gdy użytkownik wpisuje)
             cell.addEventListener('input', (e) => {
-                // Zwiększ licznik ruchów tylko dla edytowalnych pól
                 if (!e.target.readOnly && gameActive) {
                     movesCount++;
                 }
                 
-                // Walidacja wprowadzanej wartości
                 const maxValue = currentSize;
                 const value = parseInt(e.target.value);
                 
@@ -434,7 +423,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 setTimeout(checkGameCompletion, 100);
             });
             
-            // Event listener dla focusa
             cell.addEventListener('focus', (e) => {
                 const value = e.target.value.trim();
                 if (value) {
@@ -460,7 +448,7 @@ document.addEventListener('DOMContentLoaded', () => {
             for (let c = 0; c < boardSize; c++) {
                 const cell = document.createElement('input');
                 cell.type = 'text';
-                cell.maxLength = 2;  // dla 16x16 możesz mieć 2 znaki, dla 9x9 wystarczy 1
+                cell.maxLength = 2;  // dla 16x16 mozna mieć 2 znaki, dla 9x9 wystarczy 1
                 cell.classList.add('cell');
                 
                 const value = board[r][c];

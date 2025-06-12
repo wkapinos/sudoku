@@ -70,7 +70,8 @@ h1 {
     font-size: 1rem;
 }
 
-/* Komórki, które są podawane (nie są do zmiany przez gracza) */
+
+
 .given-number {
     background-color: #bfd1b3;
     color: #333;
@@ -103,7 +104,7 @@ button:hover {
     background-color: #35522b;
 }
 
-/* Modal styles */
+
 .modal {
     display: none;
     position: fixed;
@@ -195,7 +196,7 @@ button:hover {
 
 
 /* TŁOOOOOOOO !!!!! */
-/* === PROGRESYWNE TŁO SVG === */
+
 .background-layer {
     position: fixed;
     top: 0;
@@ -217,7 +218,7 @@ button:hover {
     background: linear-gradient(11.21deg, #B8DDE3 -0.76%, #A7F1FF 16.78%, #5386AC 113.02%);
 }
 
-/* ELEMENTY PROGRESYWNE SVG */
+/* ELEMENTY SVG */
 .bg-element {
     opacity: 0;
     transition: all 2s ease-in-out;
@@ -279,7 +280,7 @@ button:hover {
     50% { transform: translateY(-8px); }
 }
 
-/* OVERLAYE DLA GŁÓWNEJ ZAWARTOŚCI - BEZ ZMIAN */
+
 .main-content {
     position: fixed;
     top: 50%;

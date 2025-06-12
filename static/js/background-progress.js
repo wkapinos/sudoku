@@ -1,30 +1,24 @@
-// background-progress.js - WERSJA BEZ LOCALSTORAGE
-
 class BackgroundProgress {
     constructor() {
         console.log("BackgroundProgress constructor wywołany!");
-        this.currentLevel = 1; // Zawsze zaczyna od 1
+        this.currentLevel = 0; 
         this.maxLevel = 15;
         this.init();
     }
 
     init() {
-        // Usuń loadProgress() - nie używamy localStorage
         this.updateBackground();
     }
 
-    // Usuń loadProgress() i saveProgress()
-
-    async onSudokuComplete() {
+        async onSudokuComplete() {
     console.log("onSudokuComplete wywołane!");
     
     try {
         const response = await fetch('/api/user_stats');
         const stats = await response.json();
         
-        console.log("Otrzymane statystyki:", stats); // DEBUG
+        console.log("Otrzymane statystyki:", stats); 
         
-        // ZMIANA - używaj completed_games zamiast game_stats
         const totalCompleted = stats.completed_games || 0;
         
         console.log(`Ukończone gry: ${totalCompleted}, obecny poziom: ${this.currentLevel}`);

@@ -295,6 +295,22 @@ button:hover {
     align-items: center;
 }
 
+#new-game-btn {
+    border-radius: 10px;
+}
+
+.button-container {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+    margin-top: 20px;
+}
+
+#new-game-btn, #give-up-btn {
+    flex: 1;
+    max-width: 150px;
+}
+
 
 /* Przycisk pauzy */
 #pause-btn {

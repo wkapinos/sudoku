@@ -340,9 +340,15 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
+
+
+    
     // --- Funkcja do pobierania planszy Sudoku z backendu ---
     async function fetchSudokuBoard(difficulty = 'medium', boardSize = 9) {
         try {
+            document.querySelector('.main-content').style.background = 'rgba(249, 221, 216, 0.19)';
+            document.querySelector('.profile-btn').style.background = 'rgba(249, 221, 216, 0)';
+            document.querySelector('.logout-btn').style.background = 'rgba(249, 221, 216, 0)';
             // Rozpocznij tracking nowej gry
             await startGameTracking(boardSize, difficulty);
             

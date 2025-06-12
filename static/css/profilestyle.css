@@ -1,0 +1,137 @@
+/* Profile CSS - profile.css */
+
+* {
+    font-size: 20px;
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: "Dongle", "Comic Sans MS", sans-serif;
+    min-height: 100vh;
+    background: linear-gradient(11.21deg, #B8DDE3 -0.76%, #A7F1FF 16.78%, #5386AC 113.02%);
+    margin: 0;
+    padding: 20px;
+}
+
+h1 {
+    color: #555;
+    margin-bottom: 1rem;
+    font-size: 3rem;
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+h2 {
+    color: #555;
+    font-size: 2.5rem;
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+h3 {
+    color: #555;
+    font-size: 2rem;
+    margin-bottom: 15px;
+}
+
+h4 {
+    color: #555;
+    font-size: 1.5rem;
+    margin-bottom: 10px;
+}
+
+/* Container */
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+/* Header */
+header {
+    background: #f9ddd8;
+    border-radius: 15px;
+    padding: 30px;
+    margin-bottom: 30px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+    border: 1px solid #f3baba;
+    text-align: center;
+}
+
+/* Navigation */
+nav {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    margin-top: 20px;
+}
+
+nav a {
+    background: #5b744b;
+    color: #fff4f2;
+    text-decoration: none;
+    padding: 12px 20px;
+    border-radius: 8px;
+    font-size: 1.2rem;
+    transition: background-color 0.3s ease;
+}
+
+nav a:hover {
+    background-color: #35522b;
+}
+
+/* Profile Info */
+.profile-info {
+    background: #f9ddd8;
+    border-radius: 15px;
+    padding: 30px;
+    margin-bottom: 30px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+    border: 1px solid #f3baba;
+    text-align: center;
+}
+
+.profile-info p {
+    color: #555;
+    font-size: 1.2rem;
+    margin-bottom: 10px;
+}
+
+/* Stats Grid */
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+    gap: 30px;
+    margin-bottom: 30px;
+}
+
+/* Stat Cards */
+.stat-card {
+    background: #f9ddd8;
+    border-radius: 15px;
+    padding: 30px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+    border: 1px solid #f3baba;
+}
+
+.stat-card p {
+    color: #555;
+    font-size: 1.2rem;
+    margin-bottom: 8px;
+}
+
+.stat-card strong {
+    color: #5b744b;
+    font-weight: bold;
+}
+
+/* Recent Games - pełna szerokość */
+.stats-grid + .stat-card {
+    background: #f9ddd8;
+    border-radius: 15px;
+    padding: 30px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+    border: 1px solid #f3baba;
+}
+
